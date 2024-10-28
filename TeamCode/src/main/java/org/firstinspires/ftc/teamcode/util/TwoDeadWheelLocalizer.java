@@ -28,6 +28,7 @@ public final class TwoDeadWheelLocalizer implements Localizer {
     public static class Params {
         private final double inPerTick = (3.5 * Math.PI / 2000) * 0.36020518;
         public double parYTicks = 6 / inPerTick; // y position of the parallel encoder (in tick units)
+        // TODO: change perp x ticks and check direction on line 57
         public double perpXTicks = 7 / inPerTick; // x position of the perpendicular encoder (in tick units)
     }
 
