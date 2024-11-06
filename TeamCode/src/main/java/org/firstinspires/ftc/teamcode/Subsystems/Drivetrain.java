@@ -70,12 +70,12 @@ public final class Drivetrain implements Subsystem {
 
         // drive model parameters
         public double inPerTick = (3.5 * Math.PI / 2000) * 0.36020518; // diameter * PI / Ticks per rev
-        public double lateralInPerTick = inPerTick;
-        public double trackWidthTicks = 16.6 / inPerTick;
+        public double lateralInPerTick = -0.0016543692427281995;
+        public double trackWidthTicks = 6670.589129164515;
 
         // feedforward parameters (in tick units)
-        public double kS = 0;
-        public double kV = 0.00043;
+        public double kS = 1.1003591512385453;
+        public double kV = 0.0004;
         public double kA = 0.00005;
 
         // path profile parameters (in inches)
@@ -88,9 +88,9 @@ public final class Drivetrain implements Subsystem {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 0.0;
-        public double lateralGain = 0.0;
-        public double headingGain = 0.0; // shared with turn
+        public double axialGain = 5.0;
+        public double lateralGain = 5.0;
+        public double headingGain = 5.0; // shared with turn
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;

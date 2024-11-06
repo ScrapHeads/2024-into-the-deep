@@ -16,7 +16,7 @@ public class liftArm extends CommandBase {
         this.arm = arm;
         this.power = power;
 
-        //todo add comment of what it does
+        // tells the command scheduler what subsystems the command uses
         addRequirements(arm);
     }
 

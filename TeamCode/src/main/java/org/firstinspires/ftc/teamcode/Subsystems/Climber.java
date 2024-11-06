@@ -20,7 +20,7 @@ public class Climber implements Subsystem {
 
     @Override
     public void periodic() {
-        // add telemetry
+        //todo add telemetry
     }
 
     public void setPower(double power) {

@@ -9,10 +9,13 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
+import org.firstinspires.ftc.teamcode.Commands.intakeClaw;
 import org.firstinspires.ftc.teamcode.Commands.liftArm;
 import org.firstinspires.ftc.teamcode.Commands.liftClimber;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm;
@@ -30,7 +33,7 @@ public class MainTeleop extends CommandOpMode {
     //Creating climber
     Climber climber = null;
     //Creating claw
-    Claw claw = null;
+//    Claw claw = null;
     //Creating arm
     Arm arm = null;
 
@@ -52,9 +55,9 @@ public class MainTeleop extends CommandOpMode {
         climber = new Climber();
         climber.register();
 
-        //Initializing the claw
-        claw = new Claw();
-        claw.register();
+//        //Initializing the claw
+//        claw = new Claw();
+//        claw.register();
 
         //Initializing the arm
         arm = new Arm();
@@ -69,24 +72,28 @@ public class MainTeleop extends CommandOpMode {
 
         //Inputs for the climber
         driver.getGamepadButton(DPAD_UP)
-                .whenPressed(new liftClimber(climber, 0.3))
+                .whenPressed(new liftClimber(climber, 1.0))
                 .whenReleased(new liftClimber(climber, 0));
         driver.getGamepadButton(DPAD_DOWN)
-                .whenPressed(new liftClimber(climber, -0.3))
+                .whenPressed(new liftClimber(climber, -1.0))
                 .whenReleased(new liftClimber(climber, 0));
 
         //Inputs for the arm
         driver.getGamepadButton(RIGHT_BUMPER)
-                .whenPressed(new liftArm(arm, 0.3))
+                .whenPressed(new liftArm(arm, 1.0))
                 .whenReleased(new liftArm(arm, 0));
         driver.getGamepadButton(LEFT_BUMPER)
-                .whenPressed(new liftArm(arm, -0.3))
+                .whenPressed(new liftArm(arm, -1.0))
                 .whenReleased(new liftArm(arm, 0));
 
         //Inputs for the claw
-//        driver.getGamepadButton(Tri)
-//                .whenPressed(new intakeClaw(claw, .3))
-//                .whenReleased(new intakeClaw(claw, 0));
+//        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
+//                .whenActive(new intakeClaw(claw, 1))
+//                .whenInactive(new intakeClaw(claw, 0));
+//
+//        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1)
+//                .whenActive(new intakeClaw(claw, -1))
+//                .whenInactive(new intakeClaw(claw, 0));
     }
 
 
