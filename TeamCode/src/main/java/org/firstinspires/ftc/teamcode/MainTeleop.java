@@ -15,10 +15,12 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
+import org.firstinspires.ftc.teamcode.Commands.RotateArm;
 import org.firstinspires.ftc.teamcode.Commands.intakeClaw;
 import org.firstinspires.ftc.teamcode.Commands.liftArm;
 import org.firstinspires.ftc.teamcode.Commands.liftClimber;
-import org.firstinspires.ftc.teamcode.Subsystems.Arm;
+import org.firstinspires.ftc.teamcode.Subsystems.ArmLift;
+import org.firstinspires.ftc.teamcode.Subsystems.ArmRotate;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.Climber;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
@@ -28,14 +30,21 @@ public class MainTeleop extends CommandOpMode {
     //Creating all the variables used in the code
     //Creating controller
     GamepadEx driver = null;
+
     //Creating drivetrain
     Drivetrain drivetrain = null;
+
     //Creating climber
     Climber climber = null;
+
     //Creating claw
-//    Claw claw = null;
-    //Creating arm
-    Arm arm = null;
+    Claw claw = null;
+
+    //Creating armLift
+    ArmLift armLift = null;
+
+    //creating armRotate
+    ArmRotate armRotate = null;
 
     @Override
     public void initialize() {
@@ -55,13 +64,17 @@ public class MainTeleop extends CommandOpMode {
         climber = new Climber();
         climber.register();
 
-//        //Initializing the claw
-//        claw = new Claw();
-//        claw.register();
+        //Initializing the claw
+        claw = new Claw();
+        claw.register();
 
-        //Initializing the arm
-        arm = new Arm();
-        arm.register();
+        //Initializing the armLift
+        armLift = new ArmLift();
+        armLift.register();
+
+        //Initializing the armRotate
+        armRotate = new ArmRotate();
+        armRotate.register();
 
         assignControls();
     }
@@ -78,15 +91,33 @@ public class MainTeleop extends CommandOpMode {
                 .whenPressed(new liftClimber(climber, -1.0))
                 .whenReleased(new liftClimber(climber, 0));
 
-        //Inputs for the arm
-        driver.getGamepadButton(RIGHT_BUMPER)
-                .whenPressed(new liftArm(arm, 1.0))
-                .whenReleased(new liftArm(arm, 0));
-        driver.getGamepadButton(LEFT_BUMPER)
-                .whenPressed(new liftArm(arm, -1.0))
-                .whenReleased(new liftArm(arm, 0));
+        //Inputs for the armLift
+        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
+                .whenActive(new liftArm(armLift, 1))
+                .whenInactive(new liftArm(armLift, 0));
+
+        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1)
+                .whenActive(new liftArm(armLift, -1))
+                .whenInactive(new liftArm(armLift, 0));
+
+        //Inputs for the armRotate
+        driver.getGamepadButton(DPAD_LEFT)
+                .whenPressed(new RotateArm(armRotate, 1.0))
+                .whenReleased(new RotateArm(armRotate, 0));
+        driver.getGamepadButton(DPAD_RIGHT)
+                .whenPressed(new RotateArm(armRotate, -1.0))
+                .whenReleased(new RotateArm(armRotate, 0));
 
         //Inputs for the claw
+        driver.getGamepadButton(B)
+                .whenPressed(new intakeClaw(claw, 1 ))
+                .whenReleased(new intakeClaw(claw, 0));
+        driver.getGamepadButton(A)
+                .whenPressed(new intakeClaw(claw, -1))
+                .whenReleased(new intakeClaw(claw, 0));
+
+
+        //Trigger example don't uncomment
 //        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
 //                .whenActive(new intakeClaw(claw, 1))
 //                .whenInactive(new intakeClaw(claw, 0));

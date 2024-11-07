@@ -6,13 +6,13 @@ import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 
-public class Arm implements Subsystem {
+public class ArmLift implements Subsystem {
     //Designating the armLift variable to be set in the Arm function
     private final MotorEx armLift;
 
-    public Arm() {
+    public ArmLift() {
         //Linking armLift in the code to the motor on the robot
-        armLift = new MotorEx(hm, "arm", Motor.GoBILDA.RPM_312);
+        armLift = new MotorEx(hm, "armLift", Motor.GoBILDA.RPM_312);
 
         //Setting the configuration for the motor
         armLift.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
