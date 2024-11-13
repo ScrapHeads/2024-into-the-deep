@@ -11,17 +11,23 @@ public class Claw implements Subsystem {
     //Setting clawIntake variable to be set in the Claw function
     private final ServoEx clawIntake;
 
-    //private final DigitalChannel touchSensor;
+    private final DigitalChannel touchSensor;
 
     public Claw() {
         //Linking clawIntake in the code to the servo on the robot
         clawIntake = new SimpleServo(hm, "intakeClaw", -1, 1);
+
+        touchSensor = hm.get(DigitalChannel.class, "touchClaw");
 
     }
 
     @Override
     public void periodic() {
         // add telemetry
+    }
+
+    public boolean getTouchSensor() {
+        return touchSensor.getState();
     }
 
     public void setPower(double pos) {

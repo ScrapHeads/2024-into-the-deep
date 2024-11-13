@@ -6,16 +6,16 @@ import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 
-public class ArmLift implements Subsystem {
-    //Designating the armLift variable to be set in the Arm function
-    private final MotorEx armLift;
+public class ArmRotateClipper implements Subsystem {
+    //Designating the armRotateClipper variable to be set in the Arm function
+    private final MotorEx armRotateClipper;
 
-    public ArmLift() {
-        //Linking armLift in the code to the motor on the robot
-        armLift = new MotorEx(hm, "armLift", Motor.GoBILDA.RPM_312);
+    public ArmRotateClipper() {
+        //Linking armRotateClipper in the code to the motor on the robot
+        armRotateClipper = new MotorEx(hm, "armRotateClipper", Motor.GoBILDA.RPM_312);
 
         //Setting the configuration for the motor
-        armLift.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        armRotateClipper.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
     }
 
     @Override
@@ -23,9 +23,9 @@ public class ArmLift implements Subsystem {
         // add telemetry
     }
 
+
     public void setPower(double power) {
         //Setting the lift to the power in MainTeleop
-        armLift.set(power);
+        armRotateClipper.set(power);
     }
-
 }

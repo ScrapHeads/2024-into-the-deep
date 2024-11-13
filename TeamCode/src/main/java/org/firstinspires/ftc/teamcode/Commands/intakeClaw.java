@@ -19,14 +19,20 @@ public class intakeClaw extends CommandBase {
         addRequirements(claw);
     }
 
+    @Override
     public void initialize() {
         //Setting claw to the position in intakeClaw function
         claw.setPower(pos);
     }
 
     @Override
+    public void end(boolean isInterrupted) {
+        claw.setPower(0);
+    }
+
+    @Override
     public boolean isFinished() {
-        return true;
+        return claw.getTouchSensor();
     }
 }
 
