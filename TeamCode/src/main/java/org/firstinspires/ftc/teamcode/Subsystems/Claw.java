@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
@@ -12,6 +14,8 @@ public class Claw implements Subsystem {
     private final ServoEx clawIntake;
 
     private final DigitalChannel touchSensor;
+
+    private boolean isPressed;
 
     public Claw() {
         //Linking clawIntake in the code to the servo on the robot
@@ -24,10 +28,14 @@ public class Claw implements Subsystem {
     @Override
     public void periodic() {
         // add telemetry
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Touch Sensor",touchSensor.getState());
+        packet.put("Claw Pos", clawIntake.getPosition());
+        dashboard.sendTelemetryPacket(packet);
     }
 
     public boolean getTouchSensor() {
-        return touchSensor.getState();
+        return !touchSensor.getState();
     }
 
     public void setPower(double pos) {

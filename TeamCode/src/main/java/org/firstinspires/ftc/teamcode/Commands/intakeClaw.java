@@ -32,7 +32,7 @@ public class intakeClaw extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return claw.getTouchSensor();
+        return pos >= 0 && claw.getTouchSensor();
     }
 }
 

@@ -9,14 +9,12 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
-import org.firstinspires.ftc.teamcode.Commands.RotateArmClipper;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
 import org.firstinspires.ftc.teamcode.Commands.intakeClaw;
 import org.firstinspires.ftc.teamcode.Commands.liftArmIntake;
@@ -78,13 +76,13 @@ public class MainTeleop extends CommandOpMode {
         claw = new Claw();
         claw.register();
 
-        //Initializing the armLiftIntake
-        armLiftIntake = new ArmLiftIntake();
-        armLiftIntake.register();
-
         //Initializing the armRotateIntake
         armRotateIntake = new ArmRotateIntake();
         armRotateIntake.register();
+
+        //Initializing the armLiftIntake
+        armLiftIntake = new ArmLiftIntake(armRotateIntake::getRot);
+        armLiftIntake.register();
 
         //Initializing the armLiftClipper
 //        armLiftClipper = new ArmLiftClipper();
@@ -114,19 +112,19 @@ public class MainTeleop extends CommandOpMode {
         //Inputs for the whole arm for the intake side
         //Inputs for the armLiftIntake
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
-                .whenActive(new liftArmIntake(armLiftIntake, 1))
+                .whenActive(new liftArmIntake(armLiftIntake, .75))
                 .whenInactive(new liftArmIntake(armLiftIntake, 0));
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1)
-                .whenActive(new liftArmIntake(armLiftIntake, -1))
+                .whenActive(new liftArmIntake(armLiftIntake, -.75))
                 .whenInactive(new liftArmIntake(armLiftIntake, 0));
 
         //Inputs for the armRotateIntake
         driver.getGamepadButton(DPAD_LEFT)
-                .whenPressed(new RotateArmIntake(armRotateIntake, 1.0))
+                .whenPressed(new RotateArmIntake(armRotateIntake, 0.70))
                 .whenReleased(new RotateArmIntake(armRotateIntake, 0));
         driver.getGamepadButton(DPAD_RIGHT)
-                .whenPressed(new RotateArmIntake(armRotateIntake, -1.0))
+                .whenPressed(new RotateArmIntake(armRotateIntake, -0.55))
                 .whenReleased(new RotateArmIntake(armRotateIntake, 0));
 
         //Inputs for the claw intake

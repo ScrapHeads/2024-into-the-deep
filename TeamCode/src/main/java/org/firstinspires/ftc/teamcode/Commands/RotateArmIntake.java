@@ -23,6 +23,7 @@ public class RotateArmIntake extends CommandBase {
     public void initialize() {
         //Setting arm to the power set in liftArm function
         armRotateIntake.setPower(power);
+        //armRotateIntake.setPosition(ArmRotateIntake.controlState.PICK_UP);
     }
 
     @Override

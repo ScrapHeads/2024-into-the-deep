@@ -81,13 +81,13 @@ public class TestAuto extends CommandOpMode {
 //        claw = new Claw();
 //        claw.register();
 
-        //Initializing the armLiftIntake
-        armLiftIntake = new ArmLiftIntake();
-        armLiftIntake.register();
-
         //Initializing the armRotateIntake
         armRotateIntake = new ArmRotateIntake();
         armRotateIntake.register();
+
+        //Initializing the armLiftIntake
+        armLiftIntake = new ArmLiftIntake(armRotateIntake::getRot);
+        armLiftIntake.register();
 
         //Initializing the armLiftClipper
 //        armLiftClipper = new ArmLiftClipper();
