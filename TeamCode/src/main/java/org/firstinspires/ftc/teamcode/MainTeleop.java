@@ -121,10 +121,10 @@ public class MainTeleop extends CommandOpMode {
 
         //Inputs for the armRotateIntake
         driver.getGamepadButton(DPAD_LEFT)
-                .whenPressed(new RotateArmIntake(armRotateIntake, 0.70))
+                .whenPressed(new RotateArmIntake(armRotateIntake, 0.4))
                 .whenReleased(new RotateArmIntake(armRotateIntake, 0));
         driver.getGamepadButton(DPAD_RIGHT)
-                .whenPressed(new RotateArmIntake(armRotateIntake, -0.55))
+                .whenPressed(new RotateArmIntake(armRotateIntake, -0.4))
                 .whenReleased(new RotateArmIntake(armRotateIntake, 0));
 
         //Inputs for the claw intake
@@ -134,6 +134,9 @@ public class MainTeleop extends CommandOpMode {
         driver.getGamepadButton(A)
                 .whenPressed(new intakeClaw(claw, -1))
                 .whenReleased(new intakeClaw(claw, 0));
+
+//        driver.getGamepadButton(Y)
+//                .whenPressed(new RotateArmIntake())
 
 
         //Trigger example don't uncomment

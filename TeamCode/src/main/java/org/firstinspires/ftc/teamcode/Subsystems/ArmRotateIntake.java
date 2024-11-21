@@ -17,12 +17,13 @@ public class ArmRotateIntake implements Subsystem {
 
     //Designating the armLift variable to be set in the Arm function
     private final MotorEx armRotateIntake;
-    private final PIDController pidController = new PIDController(0, 0, 0);
+    private final PIDController pidController = new PIDController(0.05, 0, 0);
 
     public enum controlState {
         PLACE(90),
-        PICK_UP(10),
-        MANUAL(0);
+        PICK_UP(20),
+        MANUAL(0),
+        HOLD(15);
 
         public final double pos;
         controlState(double pos) {
@@ -33,16 +34,17 @@ public class ArmRotateIntake implements Subsystem {
     private controlState currentState = controlState.MANUAL;
 
     private double manualPower = 0;
+    private double savedPosition = 0;
 
     public ArmRotateIntake() {
         //Linking armLift in the code to the motor on the robot
         armRotateIntake = new MotorEx(hm, "armRotateIntake", Motor.GoBILDA.RPM_312);
-//        armRotateIntake.resetEncoder();
+        armRotateIntake.resetEncoder();
 
         //Setting the configuration for the motor
         armRotateIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-        pidController.setTolerance(2);
+        pidController.setTolerance(1);
     }
 
     @Override
@@ -51,7 +53,6 @@ public class ArmRotateIntake implements Subsystem {
         packet.put("degrees", getRot().getDegrees());
         packet.put("Arm pos", armRotateIntake.getCurrentPosition());
         dashboard.sendTelemetryPacket(packet);
-        // add telemetry
         switch (currentState) {
             case MANUAL:
                 armRotateIntake.set(manualPower);
@@ -62,9 +63,12 @@ public class ArmRotateIntake implements Subsystem {
             case PLACE:
                 pidController.setSetPoint(controlState.PLACE.pos);
                 break;
+            case HOLD:
+                pidController.setSetPoint(savedPosition);
+                break;
         }
-
-        double currentDegrees = new Rotation2d(armRotateIntake.getCurrentPosition() * ticksPerRadian).getDegrees();
+        double startingOffset = 2127;
+        double currentDegrees = new Rotation2d((armRotateIntake.getCurrentPosition() + startingOffset) * ticksPerRadian).getDegrees();
         double output = pidController.calculate(currentDegrees);
 
         if (pidController.atSetPoint()) {
@@ -72,10 +76,14 @@ public class ArmRotateIntake implements Subsystem {
         } else {
             armRotateIntake.set(output);
         }
+        TelemetryPacket random = new TelemetryPacket();
+        random.put("Rotation output", output);
+        dashboard.sendTelemetryPacket(random);
     }
 
     public Rotation2d getRot() {
-        double rad = armRotateIntake.getCurrentPosition() * ticksPerRadian;
+        double startingOffset = 2127;
+        double rad = (armRotateIntake.getCurrentPosition() + startingOffset) * ticksPerRadian;
         return new Rotation2d(rad);
     }
 
@@ -86,8 +94,18 @@ public class ArmRotateIntake implements Subsystem {
 
     public void setPower(double power) {
         //Setting the lift to the power in MainTeleop
-        currentState = controlState.MANUAL;
-        manualPower = power;
+//        currentState = controlState.MANUAL;
+//        manualPower = power;
 //        armRotateIntake.set(power);
+
+
+        if (power != 0) {
+            //Setting the lift to the power in MainTeleop
+            currentState = controlState.MANUAL;
+            manualPower = power;
+        } else { //stay where you are
+            currentState = controlState.HOLD;
+            savedPosition = getRot().getDegrees();
+        }
     }
 }
