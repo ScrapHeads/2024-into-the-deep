@@ -4,6 +4,12 @@ import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
+import static org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake.controlState.*;
+import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.*;
+import static org.firstinspires.ftc.teamcode.Subsystems.Climber.controlState.*;
+
+
+
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -103,29 +109,40 @@ public class MainTeleop extends CommandOpMode {
 
         //Inputs for the climber
         driver.getGamepadButton(DPAD_UP)
-                .whenPressed(new liftClimber(climber, 1.0))
-                .whenReleased(new liftClimber(climber, 0));
+                .whenPressed(new liftClimber(climber, 1.0, MANUAL_HANG))
+                .whenReleased(new liftClimber(climber, 0, STOP_HANG));
         driver.getGamepadButton(DPAD_DOWN)
-                .whenPressed(new liftClimber(climber, -1.0))
-                .whenReleased(new liftClimber(climber, 0));
+                .whenPressed(new liftClimber(climber, -1.0, MANUAL_HANG))
+                .whenReleased(new liftClimber(climber, 0, STOP_HANG));
 
         //Inputs for the whole arm for the intake side
         //Inputs for the armLiftIntake
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
-                .whenActive(new liftArmIntake(armLiftIntake, .75))
-                .whenInactive(new liftArmIntake(armLiftIntake, 0));
+                .whenActive(new liftArmIntake(armLiftIntake, .75, MANUAL_LIFT))
+                .whenInactive(new liftArmIntake(armLiftIntake, 0, HOLD_LIFT));
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1)
-                .whenActive(new liftArmIntake(armLiftIntake, -.75))
-                .whenInactive(new liftArmIntake(armLiftIntake, 0));
+                .whenActive(new liftArmIntake(armLiftIntake, -.75, MANUAL_LIFT))
+                .whenInactive(new liftArmIntake(armLiftIntake, 0, HOLD_LIFT));
 
         //Inputs for the armRotateIntake
         driver.getGamepadButton(DPAD_LEFT)
-                .whenPressed(new RotateArmIntake(armRotateIntake, 0.4))
-                .whenReleased(new RotateArmIntake(armRotateIntake, 0));
+                .whenPressed(new RotateArmIntake(armRotateIntake, 0.4, MANUAL_ROTATE))
+                .whenReleased(new RotateArmIntake(armRotateIntake, 0, HOLD_ROTATE));
         driver.getGamepadButton(DPAD_RIGHT)
-                .whenPressed(new RotateArmIntake(armRotateIntake, -0.4))
-                .whenReleased(new RotateArmIntake(armRotateIntake, 0));
+                .whenPressed(new RotateArmIntake(armRotateIntake, -0.4, MANUAL_ROTATE))
+                .whenReleased(new RotateArmIntake(armRotateIntake, 0, HOLD_ROTATE));
+
+        //Pid controls
+        driver.getGamepadButton(Y)
+                .whenPressed(new liftArmIntake(armLiftIntake, 1, PLACE_LIFT))
+                .whenPressed(new RotateArmIntake(armRotateIntake, 1, PLACE_ROTATE));
+
+        driver.getGamepadButton(X)
+                .whenPressed(new RotateArmIntake(armRotateIntake, 1 , PICK_UP_ROTATE));
+
+        driver.getGamepadButton(START)
+                .whenPressed(new liftClimber(climber, 1, LIFT_HANG));
 
         //Inputs for the claw intake
         driver.getGamepadButton(B)

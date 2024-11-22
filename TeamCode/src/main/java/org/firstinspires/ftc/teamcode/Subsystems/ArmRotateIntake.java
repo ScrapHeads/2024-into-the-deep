@@ -20,10 +20,12 @@ public class ArmRotateIntake implements Subsystem {
     private final PIDController pidController = new PIDController(0.05, 0, 0);
 
     public enum controlState {
-        PLACE(90),
-        PICK_UP(20),
-        MANUAL(0),
-        HOLD(15);
+        PLACE_ROTATE(73),
+        PICK_UP_ROTATE(1),
+        MANUAL_ROTATE(0),
+        SWAP_STATES_ROTATE(-55),
+        RESET_ROTATE(45),
+        HOLD_ROTATE(15);
 
         public final double pos;
         controlState(double pos) {
@@ -31,10 +33,12 @@ public class ArmRotateIntake implements Subsystem {
         }
     }
 
-    private controlState currentState = controlState.MANUAL;
+    private controlState currentState = controlState.MANUAL_ROTATE;
 
     private double manualPower = 0;
     private double savedPosition = 0;
+
+    boolean whatState = true;
 
     public ArmRotateIntake() {
         //Linking armLift in the code to the motor on the robot
@@ -53,20 +57,25 @@ public class ArmRotateIntake implements Subsystem {
         packet.put("degrees", getRot().getDegrees());
         packet.put("Arm pos", armRotateIntake.getCurrentPosition());
         dashboard.sendTelemetryPacket(packet);
+
         switch (currentState) {
-            case MANUAL:
+            case MANUAL_ROTATE:
                 armRotateIntake.set(manualPower);
                 return;
-            case PICK_UP:
-                pidController.setSetPoint(controlState.PICK_UP.pos);
+            case PICK_UP_ROTATE:
+                pidController.setSetPoint(controlState.PICK_UP_ROTATE.pos);
                 break;
-            case PLACE:
-                pidController.setSetPoint(controlState.PLACE.pos);
+            case PLACE_ROTATE:
+                pidController.setSetPoint(controlState.PLACE_ROTATE.pos);
                 break;
-            case HOLD:
+            case HOLD_ROTATE:
                 pidController.setSetPoint(savedPosition);
                 break;
+            case RESET_ROTATE:
+                pidController.setSetPoint(controlState.RESET_ROTATE.pos);
+                break;
         }
+
         double startingOffset = 2127;
         double currentDegrees = new Rotation2d((armRotateIntake.getCurrentPosition() + startingOffset) * ticksPerRadian).getDegrees();
         double output = pidController.calculate(currentDegrees);
@@ -87,25 +96,46 @@ public class ArmRotateIntake implements Subsystem {
         return new Rotation2d(rad);
     }
 
-
-    public void setPosition(controlState state) {
-        currentState = state;
+    public void checkState() {
+        if (whatState) {
+            whatState = false;
+            setPower(1, controlState.PLACE_ROTATE);
+        } else {
+            whatState = true;
+            setPower(1, controlState.RESET_ROTATE);
+        }
     }
 
-    public void setPower(double power) {
+    public void setPower(double power, controlState state) {
         //Setting the lift to the power in MainTeleop
 //        currentState = controlState.MANUAL;
 //        manualPower = power;
 //        armRotateIntake.set(power);
 
-
-        if (power != 0) {
-            //Setting the lift to the power in MainTeleop
-            currentState = controlState.MANUAL;
-            manualPower = power;
-        } else { //stay where you are
-            currentState = controlState.HOLD;
-            savedPosition = getRot().getDegrees();
+        if (state == ArmRotateIntake.controlState.SWAP_STATES_ROTATE) {
+            checkState();
         }
+
+        currentState = state;
+        if (currentState == controlState.MANUAL_ROTATE) {
+            manualPower = power;
+        } else if (currentState == controlState.HOLD_ROTATE) {
+            savedPosition = getRot().getDegrees();
+        } else if (currentState == controlState.PLACE_ROTATE) {
+            pidController.setSetPoint(controlState.PLACE_ROTATE.pos);
+        } else if (currentState == controlState.RESET_ROTATE) {
+            pidController.setSetPoint(controlState.RESET_ROTATE.pos);
+        } else if (currentState == controlState.PICK_UP_ROTATE) {
+            pidController.setSetPoint(controlState.PICK_UP_ROTATE.pos);
+        }
+
+//        if (power != 0) {
+//            //Setting the lift to the power in MainTeleop
+//            currentState = controlState.MANUAL_ROTATE;
+//            manualPower = power;
+//        } else { //stay where you are
+//            currentState = controlState.HOLD_ROTATE;
+//            savedPosition = getRot().getDegrees();
+//        }
     }
 }

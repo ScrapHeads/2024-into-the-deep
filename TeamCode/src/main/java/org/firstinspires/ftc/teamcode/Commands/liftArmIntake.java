@@ -10,10 +10,14 @@ public class liftArmIntake extends CommandBase {
     //Creating the power to set the motor to
     private final double power;
 
-    public liftArmIntake(ArmLiftIntake armLiftIntake, double power) {
+    private ArmLiftIntake.controlState state = null;
+
+    public liftArmIntake(ArmLiftIntake armLiftIntake, double power, ArmLiftIntake.controlState state) {
         //Taking the inputs from MainTeleop and setting them to the variables inside of this class
         this.armLiftIntake = armLiftIntake;
         this.power = power;
+
+        this.state = state;
 
         // tells the command scheduler what subsystems the command uses
         addRequirements(armLiftIntake);
@@ -22,7 +26,7 @@ public class liftArmIntake extends CommandBase {
     @Override
     public void initialize() {
         //Setting arm to the power set in liftArm function
-        armLiftIntake.setPower(power);
+        armLiftIntake.setPower(power, state);
     }
 
     @Override

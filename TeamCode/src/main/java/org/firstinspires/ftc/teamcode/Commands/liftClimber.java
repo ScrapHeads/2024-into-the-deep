@@ -10,19 +10,23 @@ public class liftClimber extends CommandBase {
     //Creating the power to set the motor to
     private final double power;
 
-    public liftClimber(Climber climber, double power) {
+    private Climber.controlState state = null;
+
+    public liftClimber(Climber climber, double power, Climber.controlState state) {
         //Taking the inputs from MainTeleop and setting them to the variables inside of this class
         this.climber = climber;
+
         this.power = power;
 
-        //todo add comment of what it does
+        this.state = state;
+
         addRequirements(climber);
     }
 
     @Override
     public void initialize() {
         //Setting climber to the power in liftClimber function
-        climber.setPower(power);
+        climber.setPower(power, state);
     }
 
     @Override

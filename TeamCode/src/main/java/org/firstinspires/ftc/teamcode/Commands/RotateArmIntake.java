@@ -10,10 +10,17 @@ public class RotateArmIntake extends CommandBase {
     //Creating the power to set the motor to
     private final double power;
 
-    public RotateArmIntake(ArmRotateIntake armRotateIntake, double power) {
+    private ArmRotateIntake.controlState state = null;
+
+
+
+    public RotateArmIntake(ArmRotateIntake armRotateIntake, double power, ArmRotateIntake.controlState state) {
         //Taking the inputs from MainTeleop and setting them to the variables inside of this class
         this.armRotateIntake = armRotateIntake;
+
         this.power = power;
+
+        this.state = state;
 
         // tells the command scheduler what subsystems the command uses
         addRequirements(armRotateIntake);
@@ -22,9 +29,10 @@ public class RotateArmIntake extends CommandBase {
     @Override
     public void initialize() {
         //Setting arm to the power set in liftArm function
-        armRotateIntake.setPower(power);
+        armRotateIntake.setPower(power, state);
         //armRotateIntake.setPosition(ArmRotateIntake.controlState.PICK_UP);
     }
+
 
     @Override
     public boolean isFinished() {

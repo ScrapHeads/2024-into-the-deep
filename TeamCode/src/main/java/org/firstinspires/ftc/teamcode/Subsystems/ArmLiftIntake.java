@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 public class ArmLiftIntake implements Subsystem {
     private static final double ticksToInches = -114.25;
-    private static final double maxArmLengthIn = 38;
+    double capExt = 33;
 
     private final PIDController pidController = new PIDController(0.3, 0, 0);
 
@@ -23,10 +23,12 @@ public class ArmLiftIntake implements Subsystem {
     private Supplier<Rotation2d> rotSupplier;
 
     public enum controlState {
-        PLACE(90),
-        PICK_UP(20),
-        MANUAL(0),
-        HOLD(15);
+        PLACE_LIFT(33),
+        PICK_UP_LIFT(3),
+        RESET_LIFT(0),
+        MANUAL_LIFT(-2),
+        SWAP_STATES_LIFT(-60),
+        HOLD_LIFT(-1);
 
         public final double pos;
         controlState(double pos) {
@@ -34,10 +36,13 @@ public class ArmLiftIntake implements Subsystem {
         }
     }
 
-    private ArmLiftIntake.controlState currentState = ArmLiftIntake.controlState.MANUAL;
+    private ArmLiftIntake.controlState currentState = ArmLiftIntake.controlState.MANUAL_LIFT;
 
     private double manualPower = 0;
     private double savedPosition = 0;
+
+    boolean whatState = true;
+
 
     public ArmLiftIntake(Supplier<Rotation2d> rotSupplier) {
         //Linking armLift in the code to the motor on the robot
@@ -63,21 +68,23 @@ public class ArmLiftIntake implements Subsystem {
         double maxExtensionIn = getMaxExtensionIn();
 
         switch (currentState) {
-            case MANUAL:
-                setPower(manualPower);
+            case MANUAL_LIFT:
+                setPower(manualPower, controlState.MANUAL_LIFT);
                 return;
-            case PICK_UP:
-                pidController.setSetPoint(ArmLiftIntake.controlState.PICK_UP.pos);
+            case PICK_UP_LIFT:
+                pidController.setSetPoint(controlState.PICK_UP_LIFT.pos);
                 break;
-            case PLACE:
-                pidController.setSetPoint(ArmLiftIntake.controlState.PLACE.pos);
+            case PLACE_LIFT:
+                pidController.setSetPoint(controlState.PLACE_LIFT.pos);
                 break;
-            case HOLD:
+            case HOLD_LIFT:
                 if (savedPosition > maxExtensionIn) {
                     savedPosition = maxExtensionIn;
                 }
                 pidController.setSetPoint(savedPosition);
                 break;
+            case RESET_LIFT:
+                pidController.setSetPoint(controlState.RESET_LIFT.pos);
         }
         double currentExtension = Math.abs(armLiftIntake.getCurrentPosition() / ticksToInches);
         double output = -pidController.calculate(currentExtension);
@@ -87,6 +94,7 @@ public class ArmLiftIntake implements Subsystem {
         } else {
             armLiftIntake.set(output);
         }
+
         TelemetryPacket random = new TelemetryPacket();
         random.put("lift output", output);
         packet.put("Max Extension", maxExtensionIn);
@@ -96,8 +104,21 @@ public class ArmLiftIntake implements Subsystem {
 
     }
 
-    public void setPower(double power) {
+    public void checkState() {
+        if (whatState) {
+            whatState = false;
+            setPower(1, controlState.PLACE_LIFT);
+        } else {
+            whatState = true;
+            setPower(1, controlState.RESET_LIFT);
+        }
+    }
+
+    public void setPower(double power, controlState state) {
         //Setting the lift to the power in MainTeleop
+        if (state == controlState.SWAP_STATES_LIFT) {
+            checkState();
+        }
 
         double currentExtension = Math.abs(armLiftIntake.getCurrentPosition() / ticksToInches);
 
@@ -109,18 +130,22 @@ public class ArmLiftIntake implements Subsystem {
         packet.put("Tick lift", armLiftIntake.getCurrentPosition());
         dashboard.sendTelemetryPacket(packet);
 
-        if (currentExtension < maxExtensionIn && power < 0) {
+        currentState = state;
+
+        if (currentExtension < maxExtensionIn && power < 0 && currentState == controlState.MANUAL_LIFT) {
             armLiftIntake.set(power);
-            currentState = controlState.MANUAL;
             manualPower = power;
-        }  else if (power > 0) {
+        }  else if (power > 0 && currentState == controlState.MANUAL_LIFT) {
             armLiftIntake.set(power);
-            currentState = controlState.MANUAL;
             manualPower = power;
+        } else if (currentState == controlState.PLACE_LIFT) {
+            pidController.setSetPoint(controlState.PLACE_LIFT.pos);
+        } else if (currentState == controlState.RESET_LIFT) {
+            pidController.setSetPoint(controlState.RESET_LIFT.pos);
         } else { // power is 0
-            //armLiftIntake.set(0);
+            armLiftIntake.set(0);
             savedPosition = currentExtension;
-            currentState = controlState.HOLD;
+            currentState = controlState.HOLD_LIFT;
         }
 
 //        if (currentExtension >= maxExtensionIn && power < 0) {
@@ -133,7 +158,6 @@ public class ArmLiftIntake implements Subsystem {
 
 
     private double getMaxExtensionIn() {
-        double capExt = 33;
         double maxExt = 0;
         if (rotSupplier.get().getDegrees() < 90) {
             maxExt = (21 / Math.abs(rotSupplier.get().getCos())) - 15;
