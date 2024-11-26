@@ -15,6 +15,8 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -59,6 +61,8 @@ public class MainTeleop extends CommandOpMode {
 
     //creating armRotateClipper
     ArmRotateClipper armRotateClipper = null;
+
+    private boolean isSlowMode = false;
 
     @Override
     public void initialize() {
@@ -107,6 +111,9 @@ public class MainTeleop extends CommandOpMode {
         //Inputs for the drive train
         drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1));
 
+//        new Trigger(() -> isSlowMode)
+//                .whileActiveOnce(new DriveContinous(drivetrain, driver, 0.5));
+
         //Inputs for the climber
         driver.getGamepadButton(DPAD_UP)
                 .whenPressed(new liftClimber(climber, 1.0, MANUAL_HANG))
@@ -136,7 +143,8 @@ public class MainTeleop extends CommandOpMode {
         //Pid controls
         driver.getGamepadButton(Y)
                 .whenPressed(new liftArmIntake(armLiftIntake, 1, PLACE_LIFT))
-                .whenPressed(new RotateArmIntake(armRotateIntake, 1, PLACE_ROTATE));
+                .whenPressed(new RotateArmIntake(armRotateIntake, 1, PLACE_ROTATE))
+                .whenPressed(new InstantCommand(() -> {isSlowMode = true;}));
 
         driver.getGamepadButton(X)
                 .whenPressed(new RotateArmIntake(armRotateIntake, 1 , PICK_UP_ROTATE));
@@ -150,6 +158,7 @@ public class MainTeleop extends CommandOpMode {
                 .whenReleased(new intakeClaw(claw, 0));
         driver.getGamepadButton(A)
                 .whenPressed(new intakeClaw(claw, -1))
+                .whenPressed(new InstantCommand(() -> {isSlowMode = false;}))
                 .whenReleased(new intakeClaw(claw, 0));
 
 //        driver.getGamepadButton(Y)

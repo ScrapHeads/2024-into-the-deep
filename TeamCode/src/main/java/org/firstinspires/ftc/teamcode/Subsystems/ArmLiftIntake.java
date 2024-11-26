@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 
 public class ArmLiftIntake implements Subsystem {
     private static final double ticksToInches = -114.25;
-    double capExt = 33;
 
     private final PIDController pidController = new PIDController(0.3, 0, 0);
 
@@ -128,7 +127,7 @@ public class ArmLiftIntake implements Subsystem {
         packet.put("Max Extension", maxExtensionIn);
         packet.put("Current Extension",currentExtension);
         packet.put("Tick lift", armLiftIntake.getCurrentPosition());
-        dashboard.sendTelemetryPacket(packet);
+//        dashboard.sendTelemetryPacket(packet);
 
         currentState = state;
 
@@ -159,8 +158,11 @@ public class ArmLiftIntake implements Subsystem {
 
     private double getMaxExtensionIn() {
         double maxExt = 0;
+        double capExt = 33;
+
+
         if (rotSupplier.get().getDegrees() < 90) {
-            maxExt = (21 / Math.abs(rotSupplier.get().getCos())) - 15;
+            maxExt = (21 / Math.abs(rotSupplier.get().getCos())) - 17;
         } else if (rotSupplier.get().getDegrees() > 90) {
             maxExt = (21 / Math.abs(rotSupplier.get().getCos())) - 19;
         }

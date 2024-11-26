@@ -48,7 +48,7 @@ public class Climber implements Subsystem {
     public void periodic() {
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("Climber Pos", climberMotor.getCurrentPosition());
-        dashboard.sendTelemetryPacket(packet);
+//        dashboard.sendTelemetryPacket(packet);
 
         switch (currentState) {
             case MANUAL_HANG:

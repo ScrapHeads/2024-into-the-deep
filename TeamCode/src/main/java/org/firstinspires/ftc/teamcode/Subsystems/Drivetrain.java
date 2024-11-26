@@ -508,6 +508,6 @@ public final class Drivetrain implements Subsystem {
 
         Drawing.drawRobot(packet.fieldOverlay(), pose);
 
-        dashboard.sendTelemetryPacket(packet);
+//        dashboard.sendTelemetryPacket(packet);
     }
 }

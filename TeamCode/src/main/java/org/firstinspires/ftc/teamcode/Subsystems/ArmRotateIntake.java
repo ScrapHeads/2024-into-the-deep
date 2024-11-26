@@ -13,7 +13,7 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 public class ArmRotateIntake implements Subsystem {
     private static final double gearRatio = 10.0;
     //private static final double ticksPerRadian = ((537.7 * gearRatio) / 2) * Math.PI;
-    private static final double ticksPerRadian = ((6.28 / 537.7) / gearRatio);
+    private static final double radiansPerTick = ((6.28 / 537.7) / gearRatio);
 
     //Designating the armLift variable to be set in the Arm function
     private final MotorEx armRotateIntake;
@@ -77,7 +77,7 @@ public class ArmRotateIntake implements Subsystem {
         }
 
         double startingOffset = 2127;
-        double currentDegrees = new Rotation2d((armRotateIntake.getCurrentPosition() + startingOffset) * ticksPerRadian).getDegrees();
+        double currentDegrees = new Rotation2d((armRotateIntake.getCurrentPosition() + startingOffset) * radiansPerTick).getDegrees();
         double output = pidController.calculate(currentDegrees);
 
         if (pidController.atSetPoint()) {
@@ -87,12 +87,12 @@ public class ArmRotateIntake implements Subsystem {
         }
         TelemetryPacket random = new TelemetryPacket();
         random.put("Rotation output", output);
-        dashboard.sendTelemetryPacket(random);
+//        dashboard.sendTelemetryPacket(random);
     }
 
     public Rotation2d getRot() {
         double startingOffset = 2127;
-        double rad = (armRotateIntake.getCurrentPosition() + startingOffset) * ticksPerRadian;
+        double rad = (armRotateIntake.getCurrentPosition() + startingOffset) * radiansPerTick;
         return new Rotation2d(rad);
     }
 
