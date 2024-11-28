@@ -24,7 +24,7 @@ public class FollowDrivePath extends CommandBase {
     @Override
     public void execute() {
         TelemetryPacket packet = new TelemetryPacket();
-        isFinished = !path.run(packet);
+        isFinished = path.run(packet);
         packet.put("test", true);
         packet.put("path", path);
         dashboard.sendTelemetryPacket(packet);
@@ -37,6 +37,6 @@ public class FollowDrivePath extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return false;
+        return !isFinished;
     }
 }

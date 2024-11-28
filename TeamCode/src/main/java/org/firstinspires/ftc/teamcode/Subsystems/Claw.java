@@ -15,8 +15,6 @@ public class Claw implements Subsystem {
 
     private final DigitalChannel touchSensor;
 
-    private boolean isPressed;
-
     public Claw() {
         //Linking clawIntake in the code to the servo on the robot
         clawIntake = new SimpleServo(hm, "intakeClaw", -1, 1);

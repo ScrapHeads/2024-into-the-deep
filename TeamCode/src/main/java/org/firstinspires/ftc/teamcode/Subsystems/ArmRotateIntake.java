@@ -17,14 +17,17 @@ public class ArmRotateIntake implements Subsystem {
 
     //Designating the armLift variable to be set in the Arm function
     private final MotorEx armRotateIntake;
+
     private final PIDController pidController = new PIDController(0.05, 0, 0);
+
+    private final PIDController pickUpPidController = new PIDController(0.008, 0, 0);
 
     public enum controlState {
         PLACE_ROTATE(73),
-        PICK_UP_ROTATE(1),
-        MANUAL_ROTATE(0),
+        PICK_UP_ROTATE(0),
+        MANUAL_ROTATE(-10),
         SWAP_STATES_ROTATE(-55),
-        RESET_ROTATE(45),
+        RESET_ROTATE(20),
         HOLD_ROTATE(15);
 
         public final double pos;
@@ -40,6 +43,8 @@ public class ArmRotateIntake implements Subsystem {
 
     boolean whatState = true;
 
+    double output;
+
     public ArmRotateIntake() {
         //Linking armLift in the code to the motor on the robot
         armRotateIntake = new MotorEx(hm, "armRotateIntake", Motor.GoBILDA.RPM_312);
@@ -49,6 +54,7 @@ public class ArmRotateIntake implements Subsystem {
         armRotateIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         pidController.setTolerance(1);
+        pickUpPidController.setTolerance(1);
     }
 
     @Override
@@ -63,7 +69,8 @@ public class ArmRotateIntake implements Subsystem {
                 armRotateIntake.set(manualPower);
                 return;
             case PICK_UP_ROTATE:
-                pidController.setSetPoint(controlState.PICK_UP_ROTATE.pos);
+//                pickUpPidController.setSetPoint(controlState.PICK_UP_ROTATE.pos);
+                pickUpPidController.setSetPoint(controlState.PICK_UP_ROTATE.pos);
                 break;
             case PLACE_ROTATE:
                 pidController.setSetPoint(controlState.PLACE_ROTATE.pos);
@@ -72,13 +79,18 @@ public class ArmRotateIntake implements Subsystem {
                 pidController.setSetPoint(savedPosition);
                 break;
             case RESET_ROTATE:
-                pidController.setSetPoint(controlState.RESET_ROTATE.pos);
+                pickUpPidController.setSetPoint(controlState.RESET_ROTATE.pos);
                 break;
         }
 
         double startingOffset = 2127;
         double currentDegrees = new Rotation2d((armRotateIntake.getCurrentPosition() + startingOffset) * radiansPerTick).getDegrees();
-        double output = pidController.calculate(currentDegrees);
+
+        output = pidController.calculate(currentDegrees);
+
+        if (currentState == controlState.PICK_UP_ROTATE || currentState == controlState.RESET_ROTATE) {
+            output = pickUpPidController.calculate(currentDegrees);
+        }
 
         if (pidController.atSetPoint()) {
             armRotateIntake.set(0);
@@ -124,9 +136,9 @@ public class ArmRotateIntake implements Subsystem {
         } else if (currentState == controlState.PLACE_ROTATE) {
             pidController.setSetPoint(controlState.PLACE_ROTATE.pos);
         } else if (currentState == controlState.RESET_ROTATE) {
-            pidController.setSetPoint(controlState.RESET_ROTATE.pos);
+            pickUpPidController.setSetPoint(controlState.RESET_ROTATE.pos);
         } else if (currentState == controlState.PICK_UP_ROTATE) {
-            pidController.setSetPoint(controlState.PICK_UP_ROTATE.pos);
+            pickUpPidController.setSetPoint(controlState.PICK_UP_ROTATE.pos);
         }
 
 //        if (power != 0) {

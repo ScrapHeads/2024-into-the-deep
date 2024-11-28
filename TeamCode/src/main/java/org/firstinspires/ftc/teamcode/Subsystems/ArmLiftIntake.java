@@ -62,7 +62,7 @@ public class ArmLiftIntake implements Subsystem {
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("ElevatorTicks", armLiftIntake.getCurrentPosition());
         packet.put("Cos of Rot", rotSupplier.get().getCos());
-        dashboard.sendTelemetryPacket(packet);
+//        dashboard.sendTelemetryPacket(packet);
 
         double maxExtensionIn = getMaxExtensionIn();
 
@@ -127,7 +127,7 @@ public class ArmLiftIntake implements Subsystem {
         packet.put("Max Extension", maxExtensionIn);
         packet.put("Current Extension",currentExtension);
         packet.put("Tick lift", armLiftIntake.getCurrentPosition());
-//        dashboard.sendTelemetryPacket(packet);
+        dashboard.sendTelemetryPacket(packet);
 
         currentState = state;
 

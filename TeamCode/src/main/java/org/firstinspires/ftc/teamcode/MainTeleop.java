@@ -147,7 +147,7 @@ public class MainTeleop extends CommandOpMode {
                 .whenPressed(new InstantCommand(() -> {isSlowMode = true;}));
 
         driver.getGamepadButton(X)
-                .whenPressed(new RotateArmIntake(armRotateIntake, 1 , PICK_UP_ROTATE));
+                .whenPressed(new RotateArmIntake(armRotateIntake, 1, PICK_UP_ROTATE));
 
         driver.getGamepadButton(START)
                 .whenPressed(new liftClimber(climber, 1, LIFT_HANG));
@@ -160,10 +160,6 @@ public class MainTeleop extends CommandOpMode {
                 .whenPressed(new intakeClaw(claw, -1))
                 .whenPressed(new InstantCommand(() -> {isSlowMode = false;}))
                 .whenReleased(new intakeClaw(claw, 0));
-
-//        driver.getGamepadButton(Y)
-//                .whenPressed(new RotateArmIntake())
-
 
         //Trigger example don't uncomment
 //        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
