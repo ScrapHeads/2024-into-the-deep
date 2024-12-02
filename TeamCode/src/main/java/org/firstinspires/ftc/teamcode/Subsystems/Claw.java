@@ -18,6 +18,7 @@ public class Claw implements Subsystem {
     public Claw() {
         //Linking clawIntake in the code to the servo on the robot
         clawIntake = new SimpleServo(hm, "intakeClaw", -1, 1);
+        clawIntake.turnToAngle(0);
 
         touchSensor = hm.get(DigitalChannel.class, "touchClaw");
 

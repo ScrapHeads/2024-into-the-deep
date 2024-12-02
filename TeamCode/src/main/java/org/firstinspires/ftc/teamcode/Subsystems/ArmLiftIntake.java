@@ -27,6 +27,7 @@ public class ArmLiftIntake implements Subsystem {
         RESET_LIFT(0),
         MANUAL_LIFT(-2),
         SWAP_STATES_LIFT(-60),
+        PRE_PLACE_AUTO(15),
         HOLD_LIFT(-1);
 
         public final double pos;
@@ -75,6 +76,9 @@ public class ArmLiftIntake implements Subsystem {
                 break;
             case PLACE_LIFT:
                 pidController.setSetPoint(controlState.PLACE_LIFT.pos);
+                break;
+            case PRE_PLACE_AUTO:
+                pidController.setSetPoint(controlState.PRE_PLACE_AUTO.pos);
                 break;
             case HOLD_LIFT:
                 if (savedPosition > maxExtensionIn) {
@@ -141,6 +145,8 @@ public class ArmLiftIntake implements Subsystem {
             pidController.setSetPoint(controlState.PLACE_LIFT.pos);
         } else if (currentState == controlState.RESET_LIFT) {
             pidController.setSetPoint(controlState.RESET_LIFT.pos);
+        } else if (currentState == controlState.PRE_PLACE_AUTO) {
+            pidController.setSetPoint(controlState.PRE_PLACE_AUTO.pos);
         } else { // power is 0
             armLiftIntake.set(0);
             savedPosition = currentExtension;
@@ -160,7 +166,6 @@ public class ArmLiftIntake implements Subsystem {
         double maxExt = 0;
         double capExt = 33;
 
-
         if (rotSupplier.get().getDegrees() < 90) {
             maxExt = (21 / Math.abs(rotSupplier.get().getCos())) - 17;
         } else if (rotSupplier.get().getDegrees() > 90) {
@@ -170,6 +175,12 @@ public class ArmLiftIntake implements Subsystem {
             maxExt = capExt;
         }
         return maxExt;
+    }
+
+    public boolean isAtPosition(double tolerance) {
+        double curPos = Math.abs(armLiftIntake.getCurrentPosition() / ticksToInches);
+        double desiredPos = currentState.pos;
+        return Math.abs(curPos - desiredPos) <= tolerance;
     }
 
 }

@@ -16,12 +16,14 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.WaitUntilCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
 import org.firstinspires.ftc.teamcode.Commands.intakeClaw;
@@ -61,6 +63,14 @@ public class MainTeleop extends CommandOpMode {
 
     //creating armRotateClipper
     ArmRotateClipper armRotateClipper = null;
+
+    public enum PickUpStates {
+        STATE_ONE,
+        STATE_TWO,
+        STATE_THREE
+    }
+
+    private PickUpStates currentPickUpState = PickUpStates.STATE_THREE;
 
     private boolean isSlowMode = false;
 
@@ -141,13 +151,39 @@ public class MainTeleop extends CommandOpMode {
                 .whenReleased(new RotateArmIntake(armRotateIntake, 0, HOLD_ROTATE));
 
         //Pid controls
+//        driver.getGamepadButton(Y)
+//                .whenPressed(new liftArmIntake(armLiftIntake, 1, PLACE_LIFT))
+//                .whenPressed(new RotateArmIntake(armRotateIntake, 1, PLACE_ROTATE))
+//                .whenPressed(new InstantCommand(() -> {isSlowMode = true;}));
+
         driver.getGamepadButton(Y)
-                .whenPressed(new liftArmIntake(armLiftIntake, 1, PLACE_LIFT))
-                .whenPressed(new RotateArmIntake(armRotateIntake, 1, PLACE_ROTATE))
-                .whenPressed(new InstantCommand(() -> {isSlowMode = true;}));
+                .whenPressed(new PlacePieceHB(armLiftIntake, armRotateIntake, claw));
 
         driver.getGamepadButton(X)
-                .whenPressed(new RotateArmIntake(armRotateIntake, 1, PICK_UP_ROTATE));
+                .whenPressed(new InstantCommand(this::advancedPickUpStates));
+
+        new Trigger(() -> currentPickUpState == PickUpStates.STATE_ONE)
+                .whenActive(
+                        new RotateArmIntake(armRotateIntake, 1, PRE_PICK_UP_ROTATE)
+                        );
+
+        new Trigger(() -> currentPickUpState == PickUpStates.STATE_TWO)
+                .whenActive(
+                        new SequentialCommandGroup(
+                                new RotateArmIntake(armRotateIntake, 1, PICK_UP_ROTATE),
+                                new intakeClaw(claw, -1).andThen(
+                                    new RotateArmIntake(armRotateIntake, 1, PRE_PICK_UP_ROTATE)
+                                )
+                        )
+                );
+
+        new Trigger(() -> currentPickUpState == PickUpStates.STATE_THREE)
+                .whenActive(
+                        new ParallelCommandGroup(
+                                new RotateArmIntake(armRotateIntake, 1, TUCK_ROTATE),
+                                new intakeClaw(claw, 0)
+                        )
+                );
 
         driver.getGamepadButton(START)
                 .whenPressed(new liftClimber(climber, 1, LIFT_HANG));
@@ -158,7 +194,7 @@ public class MainTeleop extends CommandOpMode {
                 .whenReleased(new intakeClaw(claw, 0));
         driver.getGamepadButton(A)
                 .whenPressed(new intakeClaw(claw, -1))
-                .whenPressed(new InstantCommand(() -> {isSlowMode = false;}))
+//                .whenPressed(new InstantCommand(() -> {isSlowMode = false;}))
                 .whenReleased(new intakeClaw(claw, 0));
 
         //Trigger example don't uncomment
@@ -171,5 +207,17 @@ public class MainTeleop extends CommandOpMode {
 //                .whenInactive(new intakeClaw(claw, 0));
     }
 
-
+    private void advancedPickUpStates() {
+        switch(currentPickUpState) {
+            case STATE_ONE:
+                currentPickUpState = PickUpStates.STATE_TWO;
+                break;
+            case STATE_TWO:
+                currentPickUpState = PickUpStates.STATE_THREE;
+                break;
+            case STATE_THREE:
+                currentPickUpState = PickUpStates.STATE_ONE;
+                break;
+        };
+    }
 }

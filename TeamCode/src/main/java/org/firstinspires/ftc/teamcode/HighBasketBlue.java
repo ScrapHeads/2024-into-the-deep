@@ -3,11 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake.controlState.PLACE_LIFT;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake.controlState.RESET_LIFT;
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PICK_UP_ROTATE;
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PLACE_ROTATE;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.RESET_ROTATE;
+import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PRE_PICK_UP_ROTATE;
+import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.TUCK_ROTATE;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -17,16 +16,14 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
-import com.arcrobotics.ftclib.command.WaitUntilCommand;
-import com.arcrobotics.ftclib.hardware.GyroEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAuto;
+import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAutoThirdSpikeHB;
+import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
+import org.firstinspires.ftc.teamcode.Commands.Automation.PrePlaceHBAuto;
 import org.firstinspires.ftc.teamcode.Commands.FollowDrivePath;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
-import org.firstinspires.ftc.teamcode.Commands.intakeClaw;
-import org.firstinspires.ftc.teamcode.Commands.liftArmIntake;
-import org.firstinspires.ftc.teamcode.Commands.liftClimber;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateClipper;
@@ -96,59 +93,97 @@ public class HighBasketBlue extends CommandOpMode {
 //        armRotateClipper = new ArmRotateClipper();
 //        armRotateClipper.register();
 
-        TrajectoryActionBuilder firstTrajectory = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                .splineToLinearHeading(new Pose2d(23, 28.5, Math.toRadians(-45)), Math.toRadians(0));
+        TrajectoryActionBuilder pickUpPreFirstBlock = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+                .splineToLinearHeading(new Pose2d(16, 32.5, Math.toRadians(-45)), Math.toRadians(-45));
 
-        TrajectoryActionBuilder secondTrajectory = drivetrain.actionBuilder(new Pose2d(15, 28.5, Math.toRadians(-45)))
-                .splineToLinearHeading(new Pose2d(27, 19.5, Math.toRadians(-45)), Math.toRadians(0));
+        TrajectoryActionBuilder pickUpFirstBlock = drivetrain.actionBuilder(new Pose2d(16, 32.5, Math.toRadians(-45)))
+                .splineToLinearHeading(new Pose2d(23, 27.5, Math.toRadians(-45)), Math.toRadians(0));
 
-        TrajectoryActionBuilder thirdTrajectory = drivetrain.actionBuilder(new Pose2d(27, 19, Math.toRadians(-45)))
-                .splineToLinearHeading(new Pose2d(15, -15, Math.toRadians(0)), Math.toRadians(0));
+        TrajectoryActionBuilder placeFirstBlock = drivetrain.actionBuilder(new Pose2d(23, 27.5, Math.toRadians(-45)))
+                .splineToLinearHeading(new Pose2d(1, -8, Math.toRadians(0)), Math.toRadians(-45));
+
+        TrajectoryActionBuilder pickUpPreSecondBlock = drivetrain.actionBuilder(new Pose2d(1, -8, Math.toRadians(0)))
+                .splineToLinearHeading(new Pose2d(25, 17, Math.toRadians(-45)), Math.toRadians(-45));
+
+        TrajectoryActionBuilder pickUpSecondBlock = drivetrain.actionBuilder(new Pose2d(25, 17, Math.toRadians(-45)))
+                .splineToLinearHeading(new Pose2d(33, 10.5, Math.toRadians(-45)), Math.toRadians(0));
+
+        TrajectoryActionBuilder placeSecondBlock = drivetrain.actionBuilder(new Pose2d(33, 10.5, Math.toRadians(-45)))
+                .splineToLinearHeading(new Pose2d(46, -26, Math.toRadians(45)), Math.toRadians(0));
+
+        TrajectoryActionBuilder pickUpPreThirdBlock = drivetrain.actionBuilder(new Pose2d(46, -26, Math.toRadians(45)))
+                .splineToLinearHeading(new Pose2d(20, -3, Math.toRadians(0)), Math.toRadians(90));
+
+        TrajectoryActionBuilder pickUpThirdBlock = drivetrain.actionBuilder(new Pose2d(20, -3, Math.toRadians(0)))
+                .splineToLinearHeading(new Pose2d(24, -3, Math.toRadians(0)), Math.toRadians(0));
+
+        TrajectoryActionBuilder placeThirdBlock = drivetrain.actionBuilder(new Pose2d(24, -3, Math.toRadians(0)))
+                .splineToLinearHeading(new Pose2d(46, -26, Math.toRadians(45)), Math.toRadians(0));
 
         schedule(new SequentialCommandGroup(
 
+                new RotateArmIntake(armRotateIntake, 1, TUCK_ROTATE),
+                new PlacePieceHB(armLiftIntake, armRotateIntake, claw),
+
                 new ParallelCommandGroup(
-                        new liftArmIntake(armLiftIntake, 1, PLACE_LIFT),
-                        new RotateArmIntake(armRotateIntake, 1, PLACE_ROTATE),
-                        new WaitCommand(1300)
+                        new PickUpFloorAuto(armRotateIntake),
+                        new FollowDrivePath(drivetrain, pickUpPreFirstBlock.build())
                 ),
 
                 new ParallelCommandGroup(
-                        new InstantCommand(() -> claw.setPower(1))
-                ),
-
-                new WaitCommand(2000),
-
-                new ParallelCommandGroup(
-                        new liftArmIntake(armLiftIntake, 1, RESET_LIFT)
-                ),
-
-                new WaitCommand(1000),
-
-                new ParallelCommandGroup(
-                        new InstantCommand(() -> claw.setPower(0)),
-                        new RotateArmIntake(armRotateIntake, 1, RESET_ROTATE)
-                ),
-
-                new ParallelCommandGroup(
-                        new FollowDrivePath(drivetrain, firstTrajectory.build())
-                ),
-
-                new ParallelCommandGroup(
-                        new RotateArmIntake(armRotateIntake, 1, PICK_UP_ROTATE),
                         new InstantCommand(() -> claw.setPower(-1)),
-                        new FollowDrivePath(drivetrain, secondTrajectory.build())
+                        new FollowDrivePath(drivetrain, pickUpFirstBlock.build())
                 ),
-
-                new WaitCommand(1000),
 
                 new ParallelCommandGroup(
                         new InstantCommand(() -> claw.setPower(0)),
-                        new RotateArmIntake(armRotateIntake, 1, PLACE_ROTATE),
-                        new FollowDrivePath(drivetrain, thirdTrajectory.build())
-                )
+                        new PrePlaceHBAuto(armLiftIntake, armRotateIntake),
+                        new FollowDrivePath(drivetrain, placeFirstBlock.build())
+                ),
 
-        ));
+                new PlacePieceHB(armLiftIntake, armRotateIntake, claw),
+
+                new ParallelCommandGroup(
+                        new PickUpFloorAuto(armRotateIntake),
+                        new FollowDrivePath(drivetrain, pickUpPreSecondBlock.build())
+                ),
+
+                new ParallelCommandGroup(
+                        new InstantCommand(() -> claw.setPower(-1)),
+                        new WaitCommand(200)
+                ),
+
+                        new FollowDrivePath(drivetrain, pickUpSecondBlock.build()),
+
+                new ParallelCommandGroup(
+                        new InstantCommand(() -> claw.setPower(0)),
+                        new PrePlaceHBAuto(armLiftIntake, armRotateIntake),
+                        new FollowDrivePath(drivetrain, placeSecondBlock.build())
+                ),
+
+                new PlacePieceHB(armLiftIntake, armRotateIntake, claw),
+
+                new ParallelCommandGroup(
+                        new PickUpFloorAutoThirdSpikeHB(armRotateIntake),
+                        new FollowDrivePath(drivetrain, pickUpPreThirdBlock.build())
+                ),
+
+                new ParallelCommandGroup(
+                        new InstantCommand(() -> claw.setPower(-1)),
+                        new WaitCommand(200)
+                ),
+
+                new FollowDrivePath(drivetrain, pickUpThirdBlock.build()),
+
+                new ParallelCommandGroup(
+                        new InstantCommand(() -> claw.setPower(0)),
+                        new PrePlaceHBAuto(armLiftIntake, armRotateIntake),
+                        new FollowDrivePath(drivetrain, placeThirdBlock.build())
+                ),
+
+                new PlacePieceHB(armLiftIntake, armRotateIntake, claw)
+
+                ));
 
 
     }

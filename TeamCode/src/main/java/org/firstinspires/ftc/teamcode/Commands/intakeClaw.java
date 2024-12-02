@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Commands;
 
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
@@ -27,6 +30,9 @@ public class intakeClaw extends CommandBase {
 
     @Override
     public void end(boolean isInterrupted) {
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("1", true);
+        dashboard.sendTelemetryPacket(packet);
         claw.setPower(0);
     }
 
