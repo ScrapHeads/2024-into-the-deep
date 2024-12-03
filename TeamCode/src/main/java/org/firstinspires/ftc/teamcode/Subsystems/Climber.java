@@ -13,13 +13,17 @@ public class Climber implements Subsystem {
     //Designating the climberMotor variable to be set in the Climber function
     private final MotorEx climberMotor;
 
-    private final PIDController pidController = new PIDController(0.3, 0, 0);
+    private final PIDController pidController = new PIDController(1.0, 0, 0);
 
     private static final double ticksToInches = 1700;
 
     public enum controlState {
         LIFT_HANG(8),
-        MANUAL_HANG(0),
+        RESET_HANG(.5),
+        MANUAL_HANG(-4),
+        HANG_ONE(7.9),
+        HANG_TWO(3.2),
+        HANG_THREE(0.5),
         STOP_HANG(-1);
 
         public final double pos;
@@ -38,7 +42,7 @@ public class Climber implements Subsystem {
 
         climberMotor.resetEncoder();
 
-        pidController.setTolerance(1);
+        pidController.setTolerance(.1);
 
         //Setting the configuration for the motor
         climberMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -47,15 +51,27 @@ public class Climber implements Subsystem {
     @Override
     public void periodic() {
         TelemetryPacket packet = new TelemetryPacket();
-        packet.put("Climber Pos", climberMotor.getCurrentPosition());
-//        dashboard.sendTelemetryPacket(packet);
+        packet.put("Climber Pos", Math.abs(climberMotor.getCurrentPosition() / ticksToInches));
+        dashboard.sendTelemetryPacket(packet);
 
         switch (currentState) {
             case MANUAL_HANG:
                 climberMotor.set(manualPower);
                 return;
+            case RESET_HANG:
+                pidController.setSetPoint(controlState.RESET_HANG.pos);
+                return;
             case LIFT_HANG:
                 pidController.setSetPoint(controlState.LIFT_HANG.pos);
+                break;
+            case HANG_ONE:
+                pidController.setSetPoint(controlState.HANG_ONE.pos);
+                break;
+            case HANG_TWO:
+                pidController.setSetPoint(controlState.HANG_TWO.pos);
+                break;
+            case HANG_THREE:
+                pidController.setSetPoint(controlState.HANG_THREE.pos);
                 break;
             case STOP_HANG:
                 climberMotor.set(0);
@@ -79,10 +95,23 @@ public class Climber implements Subsystem {
             manualPower = power;
         } else if (currentState == controlState.STOP_HANG) {
             climberMotor.set(0);
-        }
-        else if (currentState == controlState.LIFT_HANG) {
+        } else if (currentState == controlState.LIFT_HANG) {
             pidController.setSetPoint(controlState.LIFT_HANG.pos);
+        } else if (currentState == controlState.RESET_HANG) {
+            pidController.setSetPoint(controlState.RESET_HANG.pos);
+        } else if (currentState == controlState.HANG_ONE) {
+            pidController.setSetPoint(controlState.HANG_ONE.pos);
+        } else if (currentState == controlState.HANG_TWO) {
+            pidController.setSetPoint(controlState.HANG_TWO.pos);
+        } else if (currentState == controlState.HANG_THREE) {
+            pidController.setSetPoint(controlState.HANG_THREE.pos);
         }
+    }
+
+    public boolean isAtPosition(double tolerance) {
+        double curPos = Math.abs(climberMotor.getCurrentPosition() / ticksToInches);
+        double desiredPos = currentState.pos;
+        return Math.abs(curPos - desiredPos) <= tolerance;
     }
 
 }

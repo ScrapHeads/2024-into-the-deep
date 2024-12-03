@@ -28,6 +28,10 @@ public class ArmLiftIntake implements Subsystem {
         MANUAL_LIFT(-2),
         SWAP_STATES_LIFT(-60),
         PRE_PLACE_AUTO(15),
+        PRE_HANG_LOW_LIFT(13),
+        HANG_LOW_LIFT(10),
+        PRE_HANG_HIGH_LIFT(22.6),
+        HANG_HIGH_LIFT(14),
         HOLD_LIFT(-1);
 
         public final double pos;
@@ -80,6 +84,18 @@ public class ArmLiftIntake implements Subsystem {
             case PRE_PLACE_AUTO:
                 pidController.setSetPoint(controlState.PRE_PLACE_AUTO.pos);
                 break;
+            case PRE_HANG_LOW_LIFT:
+                pidController.setSetPoint(controlState.PRE_HANG_LOW_LIFT.pos);
+                break;
+            case HANG_LOW_LIFT:
+                pidController.setSetPoint(controlState.HANG_LOW_LIFT.pos);
+                break;
+            case PRE_HANG_HIGH_LIFT:
+                pidController.setSetPoint(controlState.PRE_HANG_HIGH_LIFT.pos);
+                break;
+            case HANG_HIGH_LIFT:
+                pidController.setSetPoint(controlState.HANG_HIGH_LIFT.pos);
+                break;
             case HOLD_LIFT:
                 if (savedPosition > maxExtensionIn) {
                     savedPosition = maxExtensionIn;
@@ -89,6 +105,7 @@ public class ArmLiftIntake implements Subsystem {
             case RESET_LIFT:
                 pidController.setSetPoint(controlState.RESET_LIFT.pos);
         }
+
         double currentExtension = Math.abs(armLiftIntake.getCurrentPosition() / ticksToInches);
         double output = -pidController.calculate(currentExtension);
 
@@ -104,7 +121,6 @@ public class ArmLiftIntake implements Subsystem {
         packet.put("Current Extension", currentExtension);
         packet.put("Current State", currentState);
         dashboard.sendTelemetryPacket(random);
-
     }
 
     public void checkState() {
@@ -147,7 +163,18 @@ public class ArmLiftIntake implements Subsystem {
             pidController.setSetPoint(controlState.RESET_LIFT.pos);
         } else if (currentState == controlState.PRE_PLACE_AUTO) {
             pidController.setSetPoint(controlState.PRE_PLACE_AUTO.pos);
-        } else { // power is 0
+        }
+        else if (currentState == controlState.PRE_HANG_LOW_LIFT) {
+            pidController.setSetPoint(controlState.PRE_HANG_LOW_LIFT.pos);
+        }
+        else if (currentState == controlState.HANG_LOW_LIFT) {
+            pidController.setSetPoint(controlState.HANG_LOW_LIFT.pos);
+        } else if (currentState == controlState.PRE_HANG_HIGH_LIFT) {
+            pidController.setSetPoint(controlState.PRE_HANG_HIGH_LIFT.pos);
+        } else if (currentState == controlState.HANG_HIGH_LIFT) {
+            pidController.setSetPoint(controlState.HANG_HIGH_LIFT.pos);
+        }
+        else { // power is 0
             armLiftIntake.set(0);
             savedPosition = currentExtension;
             currentState = controlState.HOLD_LIFT;

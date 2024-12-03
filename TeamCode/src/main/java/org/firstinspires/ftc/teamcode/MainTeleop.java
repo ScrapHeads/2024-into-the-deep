@@ -23,6 +23,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Commands.Automation.HangEndGame;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
@@ -31,7 +32,6 @@ import org.firstinspires.ftc.teamcode.Commands.liftArmIntake;
 import org.firstinspires.ftc.teamcode.Commands.liftClimber;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake;
-import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.Climber;
@@ -61,8 +61,10 @@ public class MainTeleop extends CommandOpMode {
     //creating armLiftClipper
     ArmLiftClipper armLiftClipper = null;
 
-    //creating armRotateClipper
-    ArmRotateClipper armRotateClipper = null;
+
+    double currentTime = getRuntime();
+
+    double totalDriverControlTime = 120;
 
     public enum PickUpStates {
         STATE_ONE,
@@ -108,18 +110,18 @@ public class MainTeleop extends CommandOpMode {
 //        armLiftClipper = new ArmLiftClipper();
 //        armLiftClipper.register();
 
-        //Initializing the armRotateClipper
-//        armRotateClipper = new ArmRotateClipper();
-//        armRotateClipper.register();
-
-
-
         assignControls();
     }
 
     public void assignControls() {
         //Inputs for the drive train
         drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1));
+
+        double timeLeft = totalDriverControlTime - currentTime;
+
+//        if (timeLeft <= 30) {
+//            new liftClimber(climber, 1, LIFT_HANG);
+//        }
 
 //        new Trigger(() -> isSlowMode)
 //                .whileActiveOnce(new DriveContinous(drivetrain, driver, 0.5));
@@ -151,10 +153,6 @@ public class MainTeleop extends CommandOpMode {
                 .whenReleased(new RotateArmIntake(armRotateIntake, 0, HOLD_ROTATE));
 
         //Pid controls
-//        driver.getGamepadButton(Y)
-//                .whenPressed(new liftArmIntake(armLiftIntake, 1, PLACE_LIFT))
-//                .whenPressed(new RotateArmIntake(armRotateIntake, 1, PLACE_ROTATE))
-//                .whenPressed(new InstantCommand(() -> {isSlowMode = true;}));
 
         driver.getGamepadButton(Y)
                 .whenPressed(new PlacePieceHB(armLiftIntake, armRotateIntake, claw));
@@ -186,7 +184,7 @@ public class MainTeleop extends CommandOpMode {
                 );
 
         driver.getGamepadButton(START)
-                .whenPressed(new liftClimber(climber, 1, LIFT_HANG));
+                .whenPressed(new HangEndGame(armLiftIntake, armRotateIntake, climber));
 
         //Inputs for the claw intake
         driver.getGamepadButton(B)
