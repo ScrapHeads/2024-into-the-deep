@@ -1,14 +1,9 @@
 package org.firstinspires.ftc.teamcode.Commands.Automation;
 
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.HANG_HIGH_ROTATE;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.HANG_LOW_ROTATE;
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PRE_HANG_HIGH_ROTATE;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PRE_HANG_LOW_ROTATE;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.TUCK_ROTATE;
-import static org.firstinspires.ftc.teamcode.Subsystems.Climber.controlState.HANG_ONE;
 import static org.firstinspires.ftc.teamcode.Subsystems.Climber.controlState.HANG_THREE;
 import static org.firstinspires.ftc.teamcode.Subsystems.Climber.controlState.HANG_TWO;
-import static org.firstinspires.ftc.teamcode.Subsystems.Climber.controlState.RESET_HANG;
 
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -38,13 +33,6 @@ public class HangEndGame extends SequentialCommandGroup {
                 new WaitUntilCommand(() -> rotation.isAtPosition(3)),
                 new liftArmIntake(lift,1 , ArmLiftIntake.controlState.HANG_HIGH_LIFT),
                 new liftClimber(climber, 1, HANG_THREE)
-//
-//                //Level two hang ISH
-//                new RotateArmIntake(rotation, 1, HANG_HIGH_ROTATE),
-//                new WaitUntilCommand(() -> rotation.isAtPosition(5)),
-//                new liftArmIntake(lift, 1, ArmLiftIntake.controlState.HANG_HIGH_LIFT),
-//                new WaitUntilCommand(() -> lift.isAtPosition(.5))
-
         );
     }
 }
