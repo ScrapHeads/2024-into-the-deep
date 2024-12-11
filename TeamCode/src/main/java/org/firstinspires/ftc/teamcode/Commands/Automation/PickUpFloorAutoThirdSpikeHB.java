@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Commands.Automation;
 
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PICK_UP_ROTATE;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PRE_PICK_UP_ROTATE;
+import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.*;
 
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;

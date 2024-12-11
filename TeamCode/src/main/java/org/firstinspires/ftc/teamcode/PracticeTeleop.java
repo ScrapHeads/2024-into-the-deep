@@ -1,5 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.START;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
@@ -8,8 +17,6 @@ import static org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper.controlSt
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake.controlState.*;
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.*;
 import static org.firstinspires.ftc.teamcode.Subsystems.Climber.controlState.*;
-
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -29,7 +36,6 @@ import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
 import org.firstinspires.ftc.teamcode.Commands.intakeClaw;
-import org.firstinspires.ftc.teamcode.Commands.liftArmClipper;
 import org.firstinspires.ftc.teamcode.Commands.liftArmIntake;
 import org.firstinspires.ftc.teamcode.Commands.liftClimber;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper;
@@ -39,8 +45,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.Climber;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
-@TeleOp(name = "MainTeleop", group = "ScrapHeads")
-public class MainTeleop extends CommandOpMode {
+@TeleOp(name = "PracticeTeleop", group = "ScrapHeads")
+public class PracticeTeleop extends CommandOpMode {
     //Creating all the variables used in the code
 
     //Creating controller
@@ -63,15 +69,6 @@ public class MainTeleop extends CommandOpMode {
 
     //creating armLiftClipper
     ArmLiftClipper armLiftClipper = null;
-
-    //Set time to lift Climber
-    double timeTillClimb = 100;
-
-    private boolean whatTime;
-
-    ElapsedTime timePassed = new ElapsedTime();
-
-
 
     public enum PickUpStates {
         STATE_ONE,
@@ -117,7 +114,6 @@ public class MainTeleop extends CommandOpMode {
 //        armLiftClipper = new ArmLiftClipper();
 //        armLiftClipper.register();
 
-        timePassed.reset();
         assignControls();
     }
 
@@ -128,17 +124,8 @@ public class MainTeleop extends CommandOpMode {
         //Statements for in game functions
         ///TODO test the function for time
 
-        double timeSeconds = timePassed.seconds();
-
-        TelemetryPacket packet = new TelemetryPacket();
-        packet.put("Time Passed", timeSeconds);
-        dashboard.sendTelemetryPacket(packet);
-
-        new Trigger(() -> timePassed.seconds() >= timeTillClimb)
-                .whileActiveOnce(new liftClimber(climber, 1, HANG_ONE));
-
-//        new Trigger(() -> isSlowMode)
-//                .whileActiveOnce(new DriveContinous(drivetrain, driver, 0.5));
+        new Trigger(() -> isSlowMode)
+                .whileActiveOnce(new DriveContinous(drivetrain, driver, 0.3));
 
         //Inputs for the climber
         driver.getGamepadButton(DPAD_UP)
@@ -167,7 +154,9 @@ public class MainTeleop extends CommandOpMode {
 
         //Pid controls
         driver.getGamepadButton(Y)
-                .whenPressed(new PlacePieceHB(armLiftIntake, armRotateIntake, claw));
+                .whenPressed(new PlacePieceHB(armLiftIntake, armRotateIntake, claw))
+                .whenPressed(new InstantCommand(() -> {isSlowMode = true;}))
+                .whenReleased(new InstantCommand(() -> {isSlowMode = false;}));
 
         driver.getGamepadButton(X)
                 .whenPressed(new InstantCommand(this::advancedPickUpStates));
@@ -175,7 +164,8 @@ public class MainTeleop extends CommandOpMode {
         new Trigger(() -> currentPickUpState == PickUpStates.STATE_ONE)
                 .whenActive(
                         new RotateArmIntake(armRotateIntake, 1, PRE_PICK_UP_ROTATE)
-                        );
+                )
+                .whileActiveOnce(new InstantCommand(() -> {isSlowMode = true;}));
 
         new Trigger(() -> currentPickUpState == PickUpStates.STATE_TWO)
                 .whenActive(
@@ -183,7 +173,7 @@ public class MainTeleop extends CommandOpMode {
                                 new RotateArmIntake(armRotateIntake, 1, PICK_UP_ROTATE),
                                 new intakeClaw(claw, -1).andThen(
                                         new liftArmIntake(armLiftIntake, 1, RESET_LIFT),
-                                    new RotateArmIntake(armRotateIntake, 1, PRE_PICK_UP_ROTATE)
+                                        new RotateArmIntake(armRotateIntake, 1, PRE_PICK_UP_ROTATE)
                                 )
                         )
                 );
@@ -194,7 +184,8 @@ public class MainTeleop extends CommandOpMode {
                                 new RotateArmIntake(armRotateIntake, 1, TUCK_ROTATE),
                                 new intakeClaw(claw, 0)
                         )
-                );
+                )
+                .whileActiveOnce(new InstantCommand(() -> {isSlowMode = false;}));
 
         driver.getGamepadButton(START)
                 .whenPressed(new HangEndGame(armLiftIntake, armRotateIntake, climber));

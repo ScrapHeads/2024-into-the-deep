@@ -33,10 +33,8 @@ public class ArmRotateIntake implements Subsystem {
         SWAP_STATES_ROTATE(-55),
         PRE_PICK_UP_ROTATE(35),
         TUCK_ROTATE(100),
-        PRE_HANG_LOW_ROTATE(130),
-        HANG_LOW_ROTATE(75),
-        PRE_HANG_HIGH_ROTATE(100),
-        HANG_HIGH_ROTATE(109),
+        PRE_HANG_HIGH_ROTATE(104),
+        HANG_HIGH_ROTATE(111),
         HOLD_ROTATE(15);
 
         public final double pos;
@@ -96,12 +94,6 @@ public class ArmRotateIntake implements Subsystem {
                 isProfiled = true;
                 pickUpPidController.setGoal(controlState.PRE_PICK_UP_ROTATE.pos);
                 break;
-            case PRE_HANG_LOW_ROTATE:
-                pidController.setSetPoint(controlState.PRE_HANG_LOW_ROTATE.pos);
-                break;
-            case HANG_LOW_ROTATE:
-                pidController.setSetPoint(controlState.HANG_LOW_ROTATE.pos);
-                break;
             case PRE_HANG_HIGH_ROTATE:
                 pidController.setSetPoint(controlState.PRE_HANG_HIGH_ROTATE.pos);
                 break;
@@ -148,11 +140,6 @@ public class ArmRotateIntake implements Subsystem {
             pidController.setSetPoint(controlState.TUCK_ROTATE.pos);
         } else if (currentState == controlState.PRE_PICK_UP_ROTATE) {
             pickUpPidController.setGoal(controlState.PRE_PICK_UP_ROTATE.pos);
-        }
-        else if (currentState == controlState.HANG_LOW_ROTATE) {
-            pickUpPidController.setGoal(controlState.HANG_LOW_ROTATE.pos);
-        } else if (currentState == controlState.PRE_HANG_LOW_ROTATE) {
-            pickUpPidController.setGoal(controlState.PRE_HANG_LOW_ROTATE.pos);
         }
         else if (currentState == controlState.HANG_HIGH_ROTATE) {
             pickUpPidController.setGoal(controlState.HANG_HIGH_ROTATE.pos);

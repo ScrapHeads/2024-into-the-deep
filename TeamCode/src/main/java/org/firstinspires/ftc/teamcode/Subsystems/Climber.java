@@ -22,7 +22,7 @@ public class Climber implements Subsystem {
         RESET_HANG(.5),
         MANUAL_HANG(-4),
         HANG_ONE(7.9),
-        HANG_TWO(3.2),
+        HANG_TWO(4.0),
         HANG_THREE(0.5),
         STOP_HANG(-1);
 

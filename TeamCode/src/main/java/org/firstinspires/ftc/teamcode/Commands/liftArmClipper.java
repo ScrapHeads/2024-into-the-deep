@@ -10,10 +10,15 @@ public class liftArmClipper extends CommandBase {
     //Creating the power to set the motor to
     private final double power;
 
-    public liftArmClipper(ArmLiftClipper armLiftClipper, double power) {
+    private ArmLiftClipper.controlState state;
+
+    public liftArmClipper(ArmLiftClipper armLiftClipper, double power, ArmLiftClipper.controlState state) {
         //Taking the inputs from MainTeleop and setting them to the variables inside of this class
         this.armLiftClipper = armLiftClipper;
+
         this.power = power;
+
+        this.state = state;
 
         // tells the command scheduler what subsystems the command uses
         addRequirements(armLiftClipper);
@@ -22,7 +27,7 @@ public class liftArmClipper extends CommandBase {
     @Override
     public void initialize() {
         //Setting arm to the power set in liftArm function
-        armLiftClipper.setPower(power);
+        armLiftClipper.setPower(power, state);
     }
 
     @Override

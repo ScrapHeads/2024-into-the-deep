@@ -18,7 +18,6 @@ public class intakeClaw extends CommandBase {
         this.claw = claw;
         this.pos = pos;
 
-        //todo add comment of what it does
         addRequirements(claw);
     }
 
