@@ -94,13 +94,13 @@ public class HighBasketBlue extends CommandOpMode {
 //        armRotateClipper.register();
 
         TrajectoryActionBuilder pickUpPreFirstBlock = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                .splineToLinearHeading(new Pose2d(15, 33.5, Math.toRadians(-45)), Math.toRadians(-45));
+                .splineToLinearHeading(new Pose2d(16, 34.5, Math.toRadians(-45)), Math.toRadians(-45));
 
-        TrajectoryActionBuilder pickUpFirstBlock = drivetrain.actionBuilder(new Pose2d(15, 33.5, Math.toRadians(-45)))
+        TrajectoryActionBuilder pickUpFirstBlock = drivetrain.actionBuilder(new Pose2d(16, 34.5, Math.toRadians(-45)))
                 .splineToLinearHeading(new Pose2d(23, 27.5, Math.toRadians(-45)), Math.toRadians(0));
 
         TrajectoryActionBuilder placeFirstBlock = drivetrain.actionBuilder(new Pose2d(23, 27.5, Math.toRadians(-45)))
-                .splineToLinearHeading(new Pose2d(1, -8, Math.toRadians(0)), Math.toRadians(-45));
+                .splineToLinearHeading(new Pose2d(47, 1, Math.toRadians(45)), Math.toRadians(0));
 
         TrajectoryActionBuilder pickUpPreSecondBlock = drivetrain.actionBuilder(new Pose2d(1, -8, Math.toRadians(0)))
                 .splineToLinearHeading(new Pose2d(25, 17, Math.toRadians(-45)), Math.toRadians(-45));
