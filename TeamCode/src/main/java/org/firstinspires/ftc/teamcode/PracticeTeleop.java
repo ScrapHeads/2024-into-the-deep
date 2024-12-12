@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Commands.Automation.HangEndGame;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
+import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHBTele;
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
 import org.firstinspires.ftc.teamcode.Commands.intakeClaw;
@@ -154,7 +155,7 @@ public class PracticeTeleop extends CommandOpMode {
 
         //Pid controls
         driver.getGamepadButton(Y)
-                .whenPressed(new PlacePieceHB(armLiftIntake, armRotateIntake, claw))
+                .whenPressed(new PlacePieceHBTele(armLiftIntake, armRotateIntake, claw))
                 .whenPressed(new InstantCommand(() -> {isSlowMode = true;}))
                 .whenReleased(new InstantCommand(() -> {isSlowMode = false;}));
 

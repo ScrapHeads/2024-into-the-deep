@@ -28,13 +28,14 @@ public class ArmRotateIntake implements Subsystem {
 
     public enum controlState {
         PLACE_ROTATE(73),
+        HB_AFTER(80),
         PICK_UP_ROTATE(0),
         MANUAL_ROTATE(-10),
         SWAP_STATES_ROTATE(-55),
         PRE_PICK_UP_ROTATE(35),
         TUCK_ROTATE(100),
-        PRE_HANG_HIGH_ROTATE(104),
-        HANG_HIGH_ROTATE(111),
+        PRE_HANG_HIGH_ROTATE(105),
+        HANG_HIGH_ROTATE(110),
         HOLD_ROTATE(15);
 
         public final double pos;
@@ -87,6 +88,9 @@ public class ArmRotateIntake implements Subsystem {
             case PLACE_ROTATE:
                 pidController.setSetPoint(controlState.PLACE_ROTATE.pos);
                 break;
+            case HB_AFTER:
+                pidController.setSetPoint(controlState.HB_AFTER.pos);
+                break;
             case HOLD_ROTATE:
                 pidController.setSetPoint(savedPosition);
                 break;
@@ -134,9 +138,13 @@ public class ArmRotateIntake implements Subsystem {
             manualPower = power;
         } else if (currentState == controlState.HOLD_ROTATE) {
             savedPosition = getRot().getDegrees();
-        } else if (currentState == controlState.PLACE_ROTATE) {
+        }
+        else if (currentState == controlState.PLACE_ROTATE) {
             pidController.setSetPoint(controlState.PLACE_ROTATE.pos);
-        } else if (currentState == controlState.TUCK_ROTATE) {
+        } else if (currentState == controlState.HB_AFTER) {
+            pidController.setSetPoint(controlState.HB_AFTER.pos);
+        }
+        else if (currentState == controlState.TUCK_ROTATE) {
             pidController.setSetPoint(controlState.TUCK_ROTATE.pos);
         } else if (currentState == controlState.PRE_PICK_UP_ROTATE) {
             pickUpPidController.setGoal(controlState.PRE_PICK_UP_ROTATE.pos);

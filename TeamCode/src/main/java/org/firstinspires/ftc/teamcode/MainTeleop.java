@@ -26,6 +26,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Commands.Automation.HangEndGame;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
+import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHBTele;
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
 import org.firstinspires.ftc.teamcode.Commands.intakeClaw;
@@ -137,8 +138,8 @@ public class MainTeleop extends CommandOpMode {
         new Trigger(() -> timePassed.seconds() >= timeTillClimb)
                 .whileActiveOnce(new liftClimber(climber, 1, HANG_ONE));
 
-//        new Trigger(() -> isSlowMode)
-//                .whileActiveOnce(new DriveContinous(drivetrain, driver, 0.5));
+        new Trigger(() -> isSlowMode)
+                .whileActiveOnce(new DriveContinous(drivetrain, driver, 0.5));
 
         //Inputs for the climber
         driver.getGamepadButton(DPAD_UP)
@@ -167,7 +168,9 @@ public class MainTeleop extends CommandOpMode {
 
         //Pid controls
         driver.getGamepadButton(Y)
-                .whenPressed(new PlacePieceHB(armLiftIntake, armRotateIntake, claw));
+                .whenPressed(new PlacePieceHBTele(armLiftIntake, armRotateIntake, claw))
+                .whenPressed(new InstantCommand(() -> {isSlowMode = true;}))
+                .whenReleased(new InstantCommand(() -> {isSlowMode = false;}));;
 
         driver.getGamepadButton(X)
                 .whenPressed(new InstantCommand(this::advancedPickUpStates));
@@ -175,7 +178,8 @@ public class MainTeleop extends CommandOpMode {
         new Trigger(() -> currentPickUpState == PickUpStates.STATE_ONE)
                 .whenActive(
                         new RotateArmIntake(armRotateIntake, 1, PRE_PICK_UP_ROTATE)
-                        );
+                        )
+                .whileActiveOnce(new InstantCommand(() -> {isSlowMode = true;}));
 
         new Trigger(() -> currentPickUpState == PickUpStates.STATE_TWO)
                 .whenActive(
@@ -194,7 +198,8 @@ public class MainTeleop extends CommandOpMode {
                                 new RotateArmIntake(armRotateIntake, 1, TUCK_ROTATE),
                                 new intakeClaw(claw, 0)
                         )
-                );
+                )
+                .whileActiveOnce(new InstantCommand(() -> {isSlowMode = false;}));
 
         driver.getGamepadButton(START)
                 .whenPressed(new HangEndGame(armLiftIntake, armRotateIntake, climber));
