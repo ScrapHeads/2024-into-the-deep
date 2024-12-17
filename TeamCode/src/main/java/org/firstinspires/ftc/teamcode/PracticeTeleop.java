@@ -155,9 +155,11 @@ public class PracticeTeleop extends CommandOpMode {
 
         //Pid controls
         driver.getGamepadButton(Y)
-                .whenPressed(new PlacePieceHBTele(armLiftIntake, armRotateIntake, claw))
-                .whenPressed(new InstantCommand(() -> {isSlowMode = true;}))
-                .whenReleased(new InstantCommand(() -> {isSlowMode = false;}));
+                .whenPressed(
+                        new ParallelCommandGroup(
+                                new PlacePieceHBTele(armLiftIntake, armRotateIntake, claw),
+                                new InstantCommand(() -> {isSlowMode = true;})
+                        ).whenFinished(() -> {isSlowMode = false;}));
 
         driver.getGamepadButton(X)
                 .whenPressed(new InstantCommand(this::advancedPickUpStates));
