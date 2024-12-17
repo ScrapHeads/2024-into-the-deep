@@ -119,24 +119,24 @@ public class HighBasketBlue extends CommandOpMode {
                 .splineToLinearHeading(new Pose2d(27, 27, Math.toRadians(-45)), Math.toRadians(0));
 
         TrajectoryActionBuilder placeFirstBlock = drivetrain.actionBuilder(new Pose2d(27, 27, Math.toRadians(-45)), turnConstraints, velConstraint, accelConstraint)
-                .splineToLinearHeading(new Pose2d(41, -1, Math.toRadians(45)), Math.toRadians(45));
+                .splineToLinearHeading(new Pose2d(41, -4, Math.toRadians(45)), Math.toRadians(45));
 
-        TrajectoryActionBuilder pickUpPreSecondBlock = drivetrain.actionBuilder(new Pose2d(41, -1, Math.toRadians(45)))
+        TrajectoryActionBuilder pickUpPreSecondBlock = drivetrain.actionBuilder(new Pose2d(41, -4, Math.toRadians(45)))
                 .splineToLinearHeading(new Pose2d(25, 28, Math.toRadians(-45)), Math.toRadians(90));
 
         TrajectoryActionBuilder pickUpSecondBlock = drivetrain.actionBuilder(new Pose2d(25, 28, Math.toRadians(-45)), turnConstraints, velConstraint, accelConstraint)
                 .splineToLinearHeading(new Pose2d(33, 23, Math.toRadians(-45)), Math.toRadians(0));
 
         TrajectoryActionBuilder placeSecondBlock = drivetrain.actionBuilder(new Pose2d(33, 23, Math.toRadians(-45)), turnConstraints, velConstraint, accelConstraint)
-                .splineToLinearHeading(new Pose2d(36, -1, Math.toRadians(45)), Math.toRadians(45));
+                .splineToLinearHeading(new Pose2d(37, -8, Math.toRadians(45)), Math.toRadians(45));
 
-        TrajectoryActionBuilder pickUpPreThirdBlock = drivetrain.actionBuilder(new Pose2d(46, -26, Math.toRadians(45)))
-                .splineToLinearHeading(new Pose2d(20, -3, Math.toRadians(0)), Math.toRadians(90));
+        TrajectoryActionBuilder pickUpPreThirdBlock = drivetrain.actionBuilder(new Pose2d(37, -8, Math.toRadians(45)))
+                .splineToLinearHeading(new Pose2d(17, 17, Math.toRadians(0)), Math.toRadians(90));
 
-        TrajectoryActionBuilder pickUpThirdBlock = drivetrain.actionBuilder(new Pose2d(20, -3, Math.toRadians(0)))
+        TrajectoryActionBuilder pickUpThirdBlock = drivetrain.actionBuilder(new Pose2d(20, -3, Math.toRadians(0)), turnConstraints, velConstraint, accelConstraint)
                 .splineToLinearHeading(new Pose2d(24, -3, Math.toRadians(0)), Math.toRadians(0));
 
-        TrajectoryActionBuilder placeThirdBlock = drivetrain.actionBuilder(new Pose2d(24, -3, Math.toRadians(0)))
+        TrajectoryActionBuilder placeThirdBlock = drivetrain.actionBuilder(new Pose2d(24, -3, Math.toRadians(0)), turnConstraints, velConstraint, accelConstraint)
                 .splineToLinearHeading(new Pose2d(46, -26, Math.toRadians(45)), Math.toRadians(0));
 
         schedule(new SequentialCommandGroup(
@@ -182,12 +182,12 @@ public class HighBasketBlue extends CommandOpMode {
                         new FollowDrivePath(drivetrain, placeSecondBlock.build())
                 ),
 //
-                new PlacePieceHB(armLiftIntake, armRotateIntake, claw)
+                new PlacePieceHBTele(armLiftIntake, armRotateIntake, claw),
 //
-//                new ParallelCommandGroup(
+                new ParallelCommandGroup(
 //                        new PickUpFloorAutoThirdSpikeHB(armRotateIntake),
-//                        new FollowDrivePath(drivetrain, pickUpPreThirdBlock.build())
-//                ),
+                        new FollowDrivePath(drivetrain, pickUpPreThirdBlock.build())
+                )
 //
 //                new ParallelCommandGroup(
 //                        new InstantCommand(() -> claw.setPower(-1)),
