@@ -14,9 +14,9 @@ public class PickUpFloorAutoSecondSpikeHB extends SequentialCommandGroup {
     public PickUpFloorAutoSecondSpikeHB(ArmRotateIntake rotation) {
         addCommands(
                 new RotateArmIntake(rotation, 1, OVER_WALL_ROTATE),
-                new WaitCommand(600),
+                new WaitCommand(650),
                 new RotateArmIntake(rotation, 1, PRE_PICK_UP_ROTATE),
-                new WaitCommand(100),
+                new WaitCommand(50),
                 new RotateArmIntake(rotation, 1, PICK_UP_ROTATE)
         );
     }

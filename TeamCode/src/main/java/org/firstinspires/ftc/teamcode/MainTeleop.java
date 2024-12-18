@@ -22,6 +22,7 @@ import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.BatteryChecker;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Commands.Automation.HangEndGame;
@@ -132,8 +133,8 @@ public class MainTeleop extends CommandOpMode {
         armLiftIntake.register();
 
         //Initializing the armLiftClipper
-//        armLiftClipper = new ArmLiftClipper();
-//        armLiftClipper.register();
+        armLiftClipper = new ArmLiftClipper();
+        armLiftClipper.register();
 
         timePassed.reset();
         assignControls();
@@ -142,10 +143,9 @@ public class MainTeleop extends CommandOpMode {
     public void assignControls() {
         //Inputs for the drive train
         drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1));
+//        drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver2, 1));
 
         //Statements for in game functions
-        ///TODO test the function for time
-
         double timeSeconds = timePassed.seconds();
 
         TelemetryPacket packet = new TelemetryPacket();
@@ -225,7 +225,7 @@ public class MainTeleop extends CommandOpMode {
                 )
                 .whileActiveOnce(new InstantCommand(() -> {isSlowMode = false;}));
 
-        driver.getGamepadButton(START)
+        driver.getGamepadButton(BACK)
                 .whenPressed(new HangEndGame(armLiftIntake, armRotateIntake, climber));
 
         //Inputs for the claw intake
@@ -244,10 +244,10 @@ public class MainTeleop extends CommandOpMode {
         //Statements for in game functions controller TWO
 
         //Inputs for the climber
-        driver.getGamepadButton(DPAD_UP)
+        driver2.getGamepadButton(DPAD_UP)
                 .whenPressed(new liftClimber(climber, 1.0, MANUAL_HANG))
                 .whenReleased(new liftClimber(climber, 0, STOP_HANG));
-        driver.getGamepadButton(DPAD_DOWN)
+        driver2.getGamepadButton(DPAD_DOWN)
                 .whenPressed(new liftClimber(climber, -1.0, MANUAL_HANG))
                 .whenReleased(new liftClimber(climber, 0, STOP_HANG));
 
@@ -262,9 +262,9 @@ public class MainTeleop extends CommandOpMode {
 
         //Inputs for the claw clipper
         driver2.getGamepadButton(B)
-                .whenPressed(new RotateClipperClaw(clipperClaw, .5));
+                .whenPressed(new RotateClipperClaw(clipperClaw, 1));
         driver2.getGamepadButton(A)
-                .whenPressed(new RotateClipperClaw(clipperClaw, -.5));
+                .whenPressed(new RotateClipperClaw(clipperClaw, 0));
 
         //Pid controls
 //        driver2.getGamepadButton(X)
@@ -289,7 +289,7 @@ public class MainTeleop extends CommandOpMode {
                         )
                 );
 
-        driver2.getGamepadButton(START)
+        driver2.getGamepadButton(BACK)
                 .whenPressed(new HangEndGame(armLiftIntake, armRotateIntake, climber));
 
         //Trigger example don't uncomment

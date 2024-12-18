@@ -29,11 +29,6 @@ public class RotateClipperClaw extends CommandBase {
     }
 
     @Override
-    public void end(boolean isInterrupted) {
-        claw.setPower(0);
-    }
-
-    @Override
     public boolean isFinished() {
         return true;
     }

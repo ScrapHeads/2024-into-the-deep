@@ -13,7 +13,7 @@ public class PickUpFloorAutoThirdSpikeHB extends SequentialCommandGroup {
         addCommands(
                 new WaitCommand(750),
                 new RotateArmIntake(rotation, 1, PRE_PICK_UP_ROTATE),
-                new WaitCommand(1000),
+                new WaitCommand(800),
                 new RotateArmIntake(rotation, 1, PICK_UP_ROTATE)
         );
     }

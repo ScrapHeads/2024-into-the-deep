@@ -35,6 +35,7 @@ public class ArmRotateIntake implements Subsystem {
         PRE_PICK_UP_ROTATE(35),
         OVER_WALL_ROTATE(65),
         TUCK_ROTATE(100),
+        FINISH_ROTATE(120),
         PRE_HANG_HIGH_ROTATE(105),
         HANG_HIGH_ROTATE(110),
         HOLD_ROTATE(15);
@@ -109,8 +110,9 @@ public class ArmRotateIntake implements Subsystem {
             case HANG_HIGH_ROTATE:
                 pidController.setSetPoint(controlState.HANG_HIGH_ROTATE.pos);
                 break;
-
-
+            case FINISH_ROTATE:
+                pidController.setSetPoint(controlState.FINISH_ROTATE.pos);
+                break;
             case TUCK_ROTATE:
                 pidController.setSetPoint(controlState.TUCK_ROTATE.pos);
         }
@@ -163,6 +165,9 @@ public class ArmRotateIntake implements Subsystem {
         }
         else if (currentState == controlState.PICK_UP_ROTATE) {
             pickUpPidController.setGoal(controlState.PICK_UP_ROTATE.pos);
+        }
+        else if (currentState == controlState.FINISH_ROTATE) {
+            pickUpPidController.setGoal(controlState.FINISH_ROTATE.pos);
         }
 
     }

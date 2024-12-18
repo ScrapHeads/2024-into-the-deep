@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.BACK;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
@@ -24,6 +25,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -86,9 +88,16 @@ public class PracticeTeleop extends CommandOpMode {
         STATE_TWO
     }
 
+    public enum controllerStates {
+        CONTROLLER_ONE,
+        CONTROLLER_TWO
+    }
+
     private PickUpStates currentPickUpState = PickUpStates.STATE_THREE;
 
-    private ClipperStates currentClipperStates = ClipperStates.STATE_ONE;
+    private ClipperStates currentClipperStates = ClipperStates.STATE_TWO;
+
+    private controllerStates currentController = controllerStates.CONTROLLER_TWO;
 
     private boolean isSlowMode = false;
 
@@ -139,6 +148,23 @@ public class PracticeTeleop extends CommandOpMode {
     public void assignControls() {
         //Inputs for the drive train
         drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1));
+
+        driver.getGamepadButton(START)
+                .whenPressed(new InstantCommand(() -> currentController = controllerStates.CONTROLLER_TWO));
+
+        driver2.getGamepadButton(START)
+                .whenPressed(new InstantCommand(() -> currentController = controllerStates.CONTROLLER_ONE));
+
+        new Trigger(() -> currentController == controllerStates.CONTROLLER_ONE)
+                .whenActive(
+                        new DriveContinous(drivetrain, driver, 1)
+                );
+
+        new Trigger(() -> currentController == controllerStates.CONTROLLER_TWO)
+                .whenActive(
+                        new DriveContinous(drivetrain, driver2, 1)
+                );
+
 
         new Trigger(() -> isSlowMode)
                 .whileActiveOnce(new DriveContinous(drivetrain, driver, 0.3));
@@ -210,7 +236,7 @@ public class PracticeTeleop extends CommandOpMode {
                 )
                 .whileActiveOnce(new InstantCommand(() -> {isSlowMode = false;}));
 
-        driver.getGamepadButton(START)
+        driver.getGamepadButton(BACK)
                 .whenPressed(new HangEndGame(armLiftIntake, armRotateIntake, climber));
 
         //Inputs for the claw intake
@@ -229,10 +255,10 @@ public class PracticeTeleop extends CommandOpMode {
         //Statements for in game functions controller TWO
 
         //Inputs for the climber
-        driver.getGamepadButton(DPAD_UP)
+        driver2.getGamepadButton(DPAD_UP)
                 .whenPressed(new liftClimber(climber, 1.0, MANUAL_HANG))
                 .whenReleased(new liftClimber(climber, 0, STOP_HANG));
-        driver.getGamepadButton(DPAD_DOWN)
+        driver2.getGamepadButton(DPAD_DOWN)
                 .whenPressed(new liftClimber(climber, -1.0, MANUAL_HANG))
                 .whenReleased(new liftClimber(climber, 0, STOP_HANG));
 
@@ -247,9 +273,9 @@ public class PracticeTeleop extends CommandOpMode {
 
         //Inputs for the claw clipper
         driver2.getGamepadButton(B)
-                .whenPressed(new RotateClipperClaw(clipperClaw, .5));
+                .whenPressed(new RotateClipperClaw(clipperClaw, .6));
         driver2.getGamepadButton(A)
-                .whenPressed(new RotateClipperClaw(clipperClaw, -.5));
+                .whenPressed(new RotateClipperClaw(clipperClaw, .3));
 
         //Pid controls
 //        driver2.getGamepadButton(X)
@@ -262,19 +288,20 @@ public class PracticeTeleop extends CommandOpMode {
                 .whenActive(
                         new ParallelCommandGroup(
                                 new liftArmClipper(armLiftClipper, 1, PICK_UP_CLIPPER),
-                                new RotateClipperClaw(clipperClaw, .5)
+                                new WaitUntilCommand(() -> armLiftClipper.isAtPosition(16)).andThen(
+                                        new RotateClipperClaw(clipperClaw, .3))
                         )
                 );
 
         new Trigger(() -> currentClipperStates == ClipperStates.STATE_TWO)
                 .whenActive(
                         new ParallelCommandGroup(
-                                new liftArmClipper(armLiftClipper, 1, PLACE_CLIPPER),
-                                new RotateClipperClaw(clipperClaw, -.5)
+                                new RotateClipperClaw(clipperClaw, .6),
+                                new liftArmClipper(armLiftClipper, 1, PLACE_CLIPPER)
                         )
                 );
 
-        driver2.getGamepadButton(START)
+        driver2.getGamepadButton(BACK)
                 .whenPressed(new HangEndGame(armLiftIntake, armRotateIntake, climber));
 
         //Trigger example don't uncomment
@@ -308,6 +335,17 @@ public class PracticeTeleop extends CommandOpMode {
                 break;
             case STATE_TWO:
                 currentClipperStates = ClipperStates.STATE_ONE;
+                break;
+        };
+    }
+
+    private void whatController() {
+        switch(currentController) {
+            case CONTROLLER_ONE:
+                currentController = controllerStates.CONTROLLER_TWO;
+                break;
+            case CONTROLLER_TWO:
+                currentController = controllerStates.CONTROLLER_ONE;
                 break;
         };
     }

@@ -21,8 +21,8 @@ public class ArmLiftClipper implements Subsystem {
     public enum controlState {
         MANUAL_CLIPPER(-1),
         HOLD_CLIPPER(-2),
-        PICK_UP_CLIPPER(4),
-        PLACE_CLIPPER(12.5);
+        PICK_UP_CLIPPER(3.5),
+        PLACE_CLIPPER(21.5);
 
         public final double pos;
         controlState(double pos) {

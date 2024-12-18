@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Commands.Automation;
 
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake.controlState.PLACE_LIFT;
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake.controlState.RESET_LIFT;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.FINISH_ROTATE;
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.HB_AFTER;
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PLACE_ROTATE;
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.TUCK_ROTATE;
@@ -17,8 +16,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 
-public class PlacePieceHBTele extends SequentialCommandGroup {
-    public PlacePieceHBTele(ArmLiftIntake lift, ArmRotateIntake rotation, Claw claw) {
+public class PlacePieceHBTeleFinish extends SequentialCommandGroup {
+    public PlacePieceHBTeleFinish(ArmLiftIntake lift, ArmRotateIntake rotation, Claw claw) {
         addCommands(
 
                 new RotateArmIntake(rotation, 1, PLACE_ROTATE),
@@ -27,10 +26,10 @@ public class PlacePieceHBTele extends SequentialCommandGroup {
                 new WaitUntilCommand(() -> lift.isAtPosition(10)),
                 new intakeClaw(claw, 1).withTimeout(600),
                 new RotateArmIntake(rotation, 1, HB_AFTER),
-                new WaitUntilCommand(() -> rotation.isAtPosition(15)),
+                new WaitUntilCommand(() -> rotation.isAtPosition(5)),
                 new liftArmIntake(lift, 1, RESET_LIFT),
-                new WaitUntilCommand(() -> lift.isAtPosition(12)),
-                new RotateArmIntake(rotation, 1, FINISH_ROTATE)
+                new WaitUntilCommand(() -> lift.isAtPosition(10)),
+                new RotateArmIntake(rotation, 1, TUCK_ROTATE)
 
         );
     }

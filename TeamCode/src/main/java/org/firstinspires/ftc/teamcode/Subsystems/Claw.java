@@ -21,7 +21,6 @@ public class Claw implements Subsystem {
         clawIntake.turnToAngle(0);
 
         touchSensor = hm.get(DigitalChannel.class, "touchClaw");
-
     }
 
     @Override
