@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHBTele;
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
+import org.firstinspires.ftc.teamcode.Commands.RotateClipperClaw;
 import org.firstinspires.ftc.teamcode.Commands.intakeClaw;
 import org.firstinspires.ftc.teamcode.Commands.liftArmClipper;
 import org.firstinspires.ftc.teamcode.Commands.liftArmIntake;
@@ -38,6 +39,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.Climber;
+import org.firstinspires.ftc.teamcode.Subsystems.ClipperClaw;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
 @TeleOp(name = "MainTeleop", group = "ScrapHeads")
@@ -46,6 +48,7 @@ public class MainTeleop extends CommandOpMode {
 
     //Creating controller
     GamepadEx driver = null;
+    GamepadEx driver2 = null;
 
     //Creating drivetrain
     Drivetrain drivetrain = null;
@@ -55,6 +58,9 @@ public class MainTeleop extends CommandOpMode {
 
     //Creating claw
     Claw claw = null;
+
+    //Creating claw
+    ClipperClaw clipperClaw = null;
 
     //Creating armLiftIntake
     ArmLiftIntake armLiftIntake = null;
@@ -72,15 +78,21 @@ public class MainTeleop extends CommandOpMode {
 
     ElapsedTime timePassed = new ElapsedTime();
 
-
-
     public enum PickUpStates {
         STATE_ONE,
         STATE_TWO,
         STATE_THREE
     }
 
+    public enum ClipperStates {
+        STATE_ONE,
+        STATE_TWO
+    }
+
     private PickUpStates currentPickUpState = PickUpStates.STATE_THREE;
+
+    private ClipperStates currentClipperStates = ClipperStates.STATE_ONE;
+
 
     private boolean isSlowMode = false;
 
@@ -93,6 +105,7 @@ public class MainTeleop extends CommandOpMode {
 
         //Initializing the controller 1 for inputs in assignControls
         driver = new GamepadEx(gamepad1);
+        driver = new GamepadEx(gamepad2);
 
         // Might need to change pose2d for field centric reasons, will need to change for autos
         drivetrain = new Drivetrain(hardwareMap, new Pose2d(0, 0, 0));
@@ -105,6 +118,10 @@ public class MainTeleop extends CommandOpMode {
         //Initializing the claw
         claw = new Claw();
         claw.register();
+
+        //Initializing the claw clipper
+        clipperClaw = new ClipperClaw();
+        clipperClaw.register();
 
         //Initializing the armRotateIntake
         armRotateIntake = new ArmRotateIntake();
@@ -140,6 +157,8 @@ public class MainTeleop extends CommandOpMode {
 
         new Trigger(() -> isSlowMode)
                 .whileActiveOnce(new DriveContinous(drivetrain, driver, 0.5));
+
+        //Statements for in game functions controller one
 
         //Inputs for the climber
         driver.getGamepadButton(DPAD_UP)
@@ -177,10 +196,13 @@ public class MainTeleop extends CommandOpMode {
         driver.getGamepadButton(X)
                 .whenPressed(new InstantCommand(this::advancedPickUpStates));
 
+//        driver.getGamepadButton(BACK)
+//                .whenPressed(new liftArmClipper(armLiftClipper, 1, PICK_UP_CLIPPER));
+
         new Trigger(() -> currentPickUpState == PickUpStates.STATE_ONE)
                 .whenActive(
                         new RotateArmIntake(armRotateIntake, 1, PRE_PICK_UP_ROTATE)
-                        )
+                )
                 .whileActiveOnce(new InstantCommand(() -> {isSlowMode = true;}));
 
         new Trigger(() -> currentPickUpState == PickUpStates.STATE_TWO)
@@ -189,7 +211,7 @@ public class MainTeleop extends CommandOpMode {
                                 new RotateArmIntake(armRotateIntake, 1, PICK_UP_ROTATE),
                                 new intakeClaw(claw, -1).andThen(
                                         new liftArmIntake(armLiftIntake, 1, RESET_LIFT),
-                                    new RotateArmIntake(armRotateIntake, 1, PRE_PICK_UP_ROTATE)
+                                        new RotateArmIntake(armRotateIntake, 1, PRE_PICK_UP_ROTATE)
                                 )
                         )
                 );
@@ -215,17 +237,60 @@ public class MainTeleop extends CommandOpMode {
 //                .whenPressed(new InstantCommand(() -> {isSlowMode = false;}))
                 .whenReleased(new intakeClaw(claw, 0));
 
-        //Inputs for armLiftClipper when attached
-//        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
-//                .whenActive(new liftArmClipper(armLiftClipper, 1, MANUAL_CLIPPER))
-//                .whenInactive(new liftArmClipper(armLiftClipper, 0, HOLD_CLIPPER));
-//
-//        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1)
-//                .whenActive(new liftArmClipper(armLiftClipper, -1, MANUAL_CLIPPER))
-//                .whenInactive(new liftArmClipper(armLiftClipper, 0, HOLD_CLIPPER));
 
 
 
+
+        //Statements for in game functions controller TWO
+
+        //Inputs for the climber
+        driver.getGamepadButton(DPAD_UP)
+                .whenPressed(new liftClimber(climber, 1.0, MANUAL_HANG))
+                .whenReleased(new liftClimber(climber, 0, STOP_HANG));
+        driver.getGamepadButton(DPAD_DOWN)
+                .whenPressed(new liftClimber(climber, -1.0, MANUAL_HANG))
+                .whenReleased(new liftClimber(climber, 0, STOP_HANG));
+
+        //Inputs for the liftArmClipper
+        new Trigger(() -> driver2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
+                .whenActive(new liftArmClipper(armLiftClipper, 1, MANUAL_CLIPPER))
+                .whenInactive(new liftArmClipper(armLiftClipper, 0, HOLD_CLIPPER));
+
+        new Trigger(() -> driver2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1)
+                .whenActive(new liftArmClipper(armLiftClipper, -1, MANUAL_CLIPPER))
+                .whenInactive(new liftArmClipper(armLiftClipper, 0, HOLD_CLIPPER));
+
+        //Inputs for the claw clipper
+        driver2.getGamepadButton(B)
+                .whenPressed(new RotateClipperClaw(clipperClaw, .5));
+        driver2.getGamepadButton(A)
+                .whenPressed(new RotateClipperClaw(clipperClaw, -.5));
+
+        //Pid controls
+//        driver2.getGamepadButton(X)
+//                .whenPressed(new liftArmClipper(armLiftClipper, 1, PICK_UP_CLIPPER));
+
+        driver2.getGamepadButton(Y)
+                .whenPressed(new InstantCommand(this::advancedClipperStates));
+
+        new Trigger(() -> currentClipperStates == ClipperStates.STATE_ONE)
+                .whenActive(
+                        new ParallelCommandGroup(
+                                new liftArmClipper(armLiftClipper, 1, PICK_UP_CLIPPER),
+                                new RotateClipperClaw(clipperClaw, .5)
+                        )
+                );
+
+        new Trigger(() -> currentClipperStates == ClipperStates.STATE_TWO)
+                .whenActive(
+                        new ParallelCommandGroup(
+                                new liftArmClipper(armLiftClipper, 1, PLACE_CLIPPER),
+                                new RotateClipperClaw(clipperClaw, -.5)
+                        )
+                );
+
+        driver2.getGamepadButton(START)
+                .whenPressed(new HangEndGame(armLiftIntake, armRotateIntake, climber));
 
         //Trigger example don't uncomment
 //        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
@@ -247,6 +312,17 @@ public class MainTeleop extends CommandOpMode {
                 break;
             case STATE_THREE:
                 currentPickUpState = PickUpStates.STATE_ONE;
+                break;
+        };
+    }
+
+    private void advancedClipperStates() {
+        switch(currentClipperStates) {
+            case STATE_ONE:
+                currentClipperStates = ClipperStates.STATE_TWO;
+                break;
+            case STATE_TWO:
+                currentClipperStates = ClipperStates.STATE_ONE;
                 break;
         };
     }

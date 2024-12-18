@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
@@ -12,14 +14,15 @@ public class ArmLiftClipper implements Subsystem {
     private final MotorEx armLiftClipper;
 
     //TODO get ticks to inches
-    private static final double ticksToInches = 0;
+    private static final double ticksToInches = -115.5;
 
     private final PIDController pidController = new PIDController(0.3, 0, 0);
 
     public enum controlState {
         MANUAL_CLIPPER(-1),
         HOLD_CLIPPER(-2),
-        PLACE_CLIPPER(8);
+        PICK_UP_CLIPPER(4),
+        PLACE_CLIPPER(12.5);
 
         public final double pos;
         controlState(double pos) {
@@ -48,23 +51,55 @@ public class ArmLiftClipper implements Subsystem {
     public void periodic() {
         // add telemetry
         switch (currentState) {
+            case MANUAL_CLIPPER:
+                setPower(manualPower, controlState.MANUAL_CLIPPER);
+                return;
             case HOLD_CLIPPER:
                 pidController.setSetPoint(savedPosition);
                 break;
             case PLACE_CLIPPER:
                 pidController.setSetPoint(controlState.PLACE_CLIPPER.pos);
                 break;
-            case MANUAL_CLIPPER:
-                setPower(manualPower, controlState.MANUAL_CLIPPER);
+            case PICK_UP_CLIPPER:
+                pidController.setSetPoint(controlState.PICK_UP_CLIPPER.pos);
                 break;
+        }
+
+        double currentExtension = Math.abs(armLiftClipper.getCurrentPosition() / ticksToInches);
+        double output = -pidController.calculate(currentExtension);
+
+        if (pidController.atSetPoint()) {
+            armLiftClipper.set(0);
+        } else {
+            armLiftClipper.set(output);
         }
     }
 
     public void setPower(double power, controlState state) {
         //Setting the lift to the power in MainTeleop
-        armLiftClipper.set(power);
 
+        double currentExtension = Math.abs(armLiftClipper.getCurrentPosition() / ticksToInches);
 
+        currentState = state;
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Current Extension", currentExtension);
+        packet.put("Current Extension", armLiftClipper.getCurrentPosition());
+        packet.put("What state", state);
+        dashboard.sendTelemetryPacket(packet);
+
+        if (currentState == controlState.MANUAL_CLIPPER) {
+            armLiftClipper.set(power);
+            manualPower = power;
+        } else if (currentState == controlState.PLACE_CLIPPER) {
+            pidController.setSetPoint(controlState.PLACE_CLIPPER.pos);
+        }
+        else if (currentState == controlState.PICK_UP_CLIPPER) {
+            pidController.setSetPoint(controlState.PICK_UP_CLIPPER.pos);
+        } else {
+            armLiftClipper.set(0);
+            savedPosition = currentExtension;
+        }
     }
 
     public boolean isAtPosition(double tolerance) {

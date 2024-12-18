@@ -97,6 +97,7 @@ public class ArmLiftIntake implements Subsystem {
                 break;
             case RESET_LIFT:
                 pidController.setSetPoint(controlState.RESET_LIFT.pos);
+                break;
         }
 
         double currentExtension = Math.abs(armLiftIntake.getCurrentPosition() / ticksToInches);
@@ -174,8 +175,6 @@ public class ArmLiftIntake implements Subsystem {
 //            armLiftIntake.set(power);
 //        }
     }
-
-
 
     private double getMaxExtensionIn() {
         double maxExt = 0;
