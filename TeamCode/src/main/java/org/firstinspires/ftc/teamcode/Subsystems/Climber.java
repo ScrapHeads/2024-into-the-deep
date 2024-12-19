@@ -22,7 +22,7 @@ public class Climber implements Subsystem {
         RESET_HANG(.5),
         MANUAL_HANG(-4),
         HANG_ONE(7.9),
-        HANG_TWO(4.0),
+        HANG_TWO(4.00),
         HANG_THREE(0.5),
         STOP_HANG(-1);
 
@@ -42,7 +42,7 @@ public class Climber implements Subsystem {
 
         climberMotor.resetEncoder();
 
-        pidController.setTolerance(.1);
+        pidController.setTolerance(.05);
 
         //Setting the configuration for the motor
         climberMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);

@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.TUCK_ROTATE;
 
+import static org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper.controlState.*;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.AngularVelConstraint;
@@ -28,6 +30,7 @@ import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHBTele;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PrePlaceHBAuto;
 import org.firstinspires.ftc.teamcode.Commands.FollowDrivePath;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
+import org.firstinspires.ftc.teamcode.Commands.liftArmClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateClipper;
@@ -71,7 +74,7 @@ public class ClippingAuto extends CommandOpMode {
 
         // Might need to change pose2d for field centric reasons, will need to change for autos
 //        drivetrain = new Drivetrain(hardwareMap, new Pose2d(33, 63, Math.toRadians(0)));
-        drivetrain = new Drivetrain(hardwareMap, new Pose2d(0, 0, Math.toRadians(0)));
+        drivetrain = new Drivetrain(hardwareMap, new Pose2d(0, 0, Math.toRadians(180)));
         drivetrain.register();
 
 
@@ -92,8 +95,8 @@ public class ClippingAuto extends CommandOpMode {
         armLiftIntake.register();
 
         //Initializing the armLiftClipper
-//        armLiftClipper = new ArmLiftClipper();
-//        armLiftClipper.register();
+        armLiftClipper = new ArmLiftClipper();
+        armLiftClipper.register();
 
         //Initializing the armRotateClipper
 //        armRotateClipper = new ArmRotateClipper();
@@ -106,7 +109,7 @@ public class ClippingAuto extends CommandOpMode {
         AccelConstraint accelConstraint = new ProfileAccelConstraint(-25, 40);
 
         TrajectoryActionBuilder placeFirstClip = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(180)), Math.toRadians(0));
+                .splineToLinearHeading(new Pose2d(27, -5, Math.toRadians(180)), Math.toRadians(0));
 
         TrajectoryActionBuilder setUpPush = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)))
                 .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
@@ -140,7 +143,10 @@ public class ClippingAuto extends CommandOpMode {
 
         schedule(new SequentialCommandGroup(
 
-                new FollowDrivePath(drivetrain, placeFirstClip.build())
+                new ParallelCommandGroup(
+                        new FollowDrivePath(drivetrain, placeFirstClip.build()),
+                        new liftArmClipper(armLiftClipper, 1, PLACE_CLIPPER)
+                )
 
                 ));
 

@@ -29,7 +29,7 @@ public class ArmLiftIntake implements Subsystem {
         SWAP_STATES_LIFT(-60),
         PRE_PLACE_AUTO(15),
         PRE_HANG_HIGH_LIFT(22.6),
-        HANG_HIGH_LIFT(15),
+        HANG_HIGH_LIFT(13.5),
         HOLD_LIFT(-1);
 
         public final double pos;
