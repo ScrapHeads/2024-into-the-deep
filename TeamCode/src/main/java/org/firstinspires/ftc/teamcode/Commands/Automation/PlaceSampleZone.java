@@ -18,7 +18,7 @@ public class PlaceSampleZone extends SequentialCommandGroup {
         addCommands(
                 new RotateArmIntake(rotation, 1, PRE_PICK_UP_ROTATE),
                 new WaitUntilCommand(() -> rotation.isAtPosition(15)),
-                new intakeClaw(claw, 1).withTimeout(200),
+                new intakeClaw(claw, 1).withTimeout(500),
                 new RotateArmIntake(rotation, 1, TUCK_ROTATE)
         );
     }

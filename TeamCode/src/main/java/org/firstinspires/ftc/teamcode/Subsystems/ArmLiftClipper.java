@@ -22,6 +22,7 @@ public class ArmLiftClipper implements Subsystem {
         MANUAL_CLIPPER(-1),
         HOLD_CLIPPER(-2),
         PICK_UP_CLIPPER(3.5),
+        RESET_CLIPPER(0),
         PLACE_CLIPPER(21.5);
 
         public final double pos;
@@ -63,6 +64,9 @@ public class ArmLiftClipper implements Subsystem {
             case PICK_UP_CLIPPER:
                 pidController.setSetPoint(controlState.PICK_UP_CLIPPER.pos);
                 break;
+            case RESET_CLIPPER:
+                pidController.setSetPoint(controlState.RESET_CLIPPER.pos);
+                break;
         }
 
         double currentExtension = Math.abs(armLiftClipper.getCurrentPosition() / ticksToInches);
@@ -91,12 +95,17 @@ public class ArmLiftClipper implements Subsystem {
         if (currentState == controlState.MANUAL_CLIPPER) {
             armLiftClipper.set(power);
             manualPower = power;
-        } else if (currentState == controlState.PLACE_CLIPPER) {
+        }
+        else if (currentState == controlState.PLACE_CLIPPER) {
             pidController.setSetPoint(controlState.PLACE_CLIPPER.pos);
         }
         else if (currentState == controlState.PICK_UP_CLIPPER) {
             pidController.setSetPoint(controlState.PICK_UP_CLIPPER.pos);
-        } else {
+        }
+        else if (currentState == controlState.RESET_CLIPPER) {
+            pidController.setSetPoint(controlState.RESET_CLIPPER.pos);
+        }
+        else {
             armLiftClipper.set(0);
             savedPosition = currentExtension;
         }

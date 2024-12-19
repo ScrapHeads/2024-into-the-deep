@@ -104,8 +104,8 @@ public class ClippingAuto extends CommandOpMode {
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraint = new ProfileAccelConstraint(-25, 40);
 
-        TrajectoryActionBuilder placeFirstClip = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)))
-                .splineToLinearHeading(new Pose2d(29, -5, Math.toRadians(180)), Math.toRadians(0));
+        TrajectoryActionBuilder placeFirstClip = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)), turnConstraints, velConstraint, accelConstraint)
+                .splineToLinearHeading(new Pose2d(30, -5, Math.toRadians(180)), Math.toRadians(0));
 
         TrajectoryActionBuilder setUpPush = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)))
                 .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
