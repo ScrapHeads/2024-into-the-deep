@@ -20,7 +20,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 public class PlacePieceHBTele extends SequentialCommandGroup {
     public PlacePieceHBTele(ArmLiftIntake lift, ArmRotateIntake rotation, Claw claw) {
         addCommands(
-
                 new RotateArmIntake(rotation, 1, PLACE_ROTATE),
                 new WaitUntilCommand(() -> rotation.isAtPosition(40)),
                 new liftArmIntake(lift, 1, PLACE_LIFT),

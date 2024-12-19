@@ -23,6 +23,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.Commands.Automation.ClipFirstBlockAuto;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAuto;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAutoSecondSpikeHB;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
@@ -30,6 +31,7 @@ import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHBTele;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PrePlaceHBAuto;
 import org.firstinspires.ftc.teamcode.Commands.FollowDrivePath;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
+import org.firstinspires.ftc.teamcode.Commands.RotateClipperClaw;
 import org.firstinspires.ftc.teamcode.Commands.liftArmClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake;
@@ -37,6 +39,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.Climber;
+import org.firstinspires.ftc.teamcode.Subsystems.ClipperClaw;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
 import java.util.Arrays;
@@ -52,6 +55,9 @@ public class ClippingAuto extends CommandOpMode {
 
     //Creating claw
     Claw claw = null;
+
+    //Creating claw clipper
+    ClipperClaw clipperClaw = null;
 
     //Creating armLiftIntake
     ArmLiftIntake armLiftIntake = null;
@@ -77,22 +83,12 @@ public class ClippingAuto extends CommandOpMode {
         drivetrain = new Drivetrain(hardwareMap, new Pose2d(0, 0, Math.toRadians(180)));
         drivetrain.register();
 
-
         //Initializing the climber
         climber = new Climber();
         climber.register();
 
-        //Initializing the claw
-        claw = new Claw();
-        claw.register();
-
-        //Initializing the armRotateIntake
-        armRotateIntake = new ArmRotateIntake();
-        armRotateIntake.register();
-
-        //Initializing the armLiftIntake
-        armLiftIntake = new ArmLiftIntake(armRotateIntake::getRot);
-        armLiftIntake.register();
+        clipperClaw = new ClipperClaw();
+        clipperClaw.register();
 
         //Initializing the armLiftClipper
         armLiftClipper = new ArmLiftClipper();
@@ -109,7 +105,7 @@ public class ClippingAuto extends CommandOpMode {
         AccelConstraint accelConstraint = new ProfileAccelConstraint(-25, 40);
 
         TrajectoryActionBuilder placeFirstClip = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)))
-                .splineToLinearHeading(new Pose2d(27, -5, Math.toRadians(180)), Math.toRadians(0));
+                .splineToLinearHeading(new Pose2d(29, -5, Math.toRadians(180)), Math.toRadians(0));
 
         TrajectoryActionBuilder setUpPush = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)))
                 .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
@@ -144,8 +140,8 @@ public class ClippingAuto extends CommandOpMode {
         schedule(new SequentialCommandGroup(
 
                 new ParallelCommandGroup(
-                        new FollowDrivePath(drivetrain, placeFirstClip.build()),
-                        new liftArmClipper(armLiftClipper, 1, PLACE_CLIPPER)
+                        new ClipFirstBlockAuto(armLiftClipper, clipperClaw),
+                        new FollowDrivePath(drivetrain, placeFirstClip.build())
                 )
 
                 ));

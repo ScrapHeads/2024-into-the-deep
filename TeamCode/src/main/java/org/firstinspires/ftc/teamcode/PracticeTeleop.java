@@ -67,7 +67,7 @@ public class PracticeTeleop extends CommandOpMode {
     //Creating claw
     Claw claw = null;
 
-    //Creating claw
+    //Creating claw clipper
     ClipperClaw clipperClaw = null;
 
     //Creating armLiftIntake
@@ -286,7 +286,7 @@ public class PracticeTeleop extends CommandOpMode {
                 .whenActive(
                         new ParallelCommandGroup(
                                 new liftArmClipper(armLiftClipper, 1, PICK_UP_CLIPPER),
-                                new WaitUntilCommand(() -> armLiftClipper.isAtPosition(16)).andThen(
+                                new WaitUntilCommand(() -> armLiftClipper.isAtPosition(16.75)).andThen(
                                         new RotateClipperClaw(clipperClaw, .35))
                         )
                 );

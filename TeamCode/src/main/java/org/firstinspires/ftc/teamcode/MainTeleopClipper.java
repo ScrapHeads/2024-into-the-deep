@@ -27,6 +27,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Commands.Automation.HangEndGame;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHBTele;
+import org.firstinspires.ftc.teamcode.Commands.Automation.PlaceSampleZone;
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
 import org.firstinspires.ftc.teamcode.Commands.RotateClipperClaw;
@@ -111,7 +112,7 @@ public class MainTeleopClipper extends CommandOpMode {
 
         //Initializing the controller 1 for inputs in assignControls
         driver = new GamepadEx(gamepad1);
-        driver = new GamepadEx(gamepad2);
+        driver2 = new GamepadEx(gamepad2);
 
         // Might need to change pose2d for field centric reasons, will need to change for autos
         drivetrain = new Drivetrain(hardwareMap, new Pose2d(0, 0, 0));
@@ -165,6 +166,7 @@ public class MainTeleopClipper extends CommandOpMode {
                 .whenActive(
                         new DriveContinous(drivetrain, driver2, 1)
                 );
+
         //Statements for in game functions
         double timeSeconds = timePassed.seconds();
 
@@ -176,7 +178,10 @@ public class MainTeleopClipper extends CommandOpMode {
                 .whileActiveOnce(new liftClimber(climber, 1, HANG_ONE));
 
         new Trigger(() -> isSlowMode)
-                .whileActiveOnce(new DriveContinous(drivetrain, driver, 0.5));
+                .whileActiveOnce(new DriveContinous(drivetrain, driver, 0.3));
+
+        new Trigger(() -> !isSlowMode)
+                .whileActiveOnce(new DriveContinous(drivetrain, driver, 1.0));
 
         //Statements for in game functions controller one
 
@@ -211,7 +216,8 @@ public class MainTeleopClipper extends CommandOpMode {
                         new ParallelCommandGroup(
                                 new PlacePieceHBTele(armLiftIntake, armRotateIntake, claw),
                                 new InstantCommand(() -> {isSlowMode = true;})
-                        ).whenFinished(() -> {isSlowMode = false;}));
+                        ).whenFinished(() -> {isSlowMode = false;})
+                );
 
         driver.getGamepadButton(X)
                 .whenPressed(new InstantCommand(this::advancedPickUpStates));
@@ -234,13 +240,14 @@ public class MainTeleopClipper extends CommandOpMode {
                 );
 
         new Trigger(() -> currentPickUpState == PickUpStates.STATE_THREE)
+                .whileActiveOnce(new InstantCommand(() -> {isSlowMode = false;}))
                 .whenActive(
                         new ParallelCommandGroup(
                                 new RotateArmIntake(armRotateIntake, 1, TUCK_ROTATE),
-                                new intakeClaw(claw, 0)
+                                new intakeClaw(claw, 0),
+                                new DriveContinous(drivetrain, driver, 1)
                         )
-                )
-                .whileActiveOnce(new InstantCommand(() -> {isSlowMode = false;}));
+                );
 
         driver.getGamepadButton(BACK)
                 .whenPressed(new HangEndGame(armLiftIntake, armRotateIntake, climber));
@@ -274,10 +281,10 @@ public class MainTeleopClipper extends CommandOpMode {
                 .whenInactive(new liftArmClipper(armLiftClipper, 0, HOLD_CLIPPER));
 
         //Inputs for the claw clipper
-        driver2.getGamepadButton(B)
-                .whenPressed(new RotateClipperClaw(clipperClaw, .6));
         driver2.getGamepadButton(A)
-                .whenPressed(new RotateClipperClaw(clipperClaw, .3));
+                .whenPressed(new RotateClipperClaw(clipperClaw, .6));
+        driver2.getGamepadButton(B)
+                .whenPressed(new RotateClipperClaw(clipperClaw, .35));
 
         //Pid controls
 
@@ -288,7 +295,7 @@ public class MainTeleopClipper extends CommandOpMode {
                 .whenActive(
                         new ParallelCommandGroup(
                                 new liftArmClipper(armLiftClipper, 1, PICK_UP_CLIPPER),
-                                new WaitUntilCommand(() -> armLiftClipper.isAtPosition(16)).andThen(
+                                new WaitUntilCommand(() -> armLiftClipper.isAtPosition(16.5)).andThen(
                                         new RotateClipperClaw(clipperClaw, .35))
                         )
                 );
@@ -303,6 +310,9 @@ public class MainTeleopClipper extends CommandOpMode {
 
         driver2.getGamepadButton(BACK)
                 .whenPressed(new HangEndGame(armLiftIntake, armRotateIntake, climber));
+
+        driver2.getGamepadButton(RIGHT_BUMPER)
+                .whenPressed(new PlaceSampleZone(armRotateIntake, claw));
 
         //Trigger example don't uncomment
 //        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
