@@ -29,9 +29,9 @@ public class intakeClaw extends CommandBase {
 
     @Override
     public void end(boolean isInterrupted) {
-//        TelemetryPacket packet = new TelemetryPacket();
-//        packet.put("1", true);
-//        dashboard.sendTelemetryPacket(packet);
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("1", true);
+        dashboard.sendTelemetryPacket(packet);
         claw.setPower(0);
     }
 

@@ -12,4 +12,8 @@ public class Constants {
     public static HardwareMap hm;
     public static Telemetry tele;
     public static FtcDashboard dashboard;
+    //Originally 0
+    public static double openClaw = .7;
+    //Originally 1
+    public static double closedClaw = 1;
 }

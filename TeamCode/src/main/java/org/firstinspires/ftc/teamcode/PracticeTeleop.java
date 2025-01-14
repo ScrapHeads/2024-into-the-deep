@@ -11,8 +11,10 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.START;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
+import static org.firstinspires.ftc.teamcode.Constants.closedClaw;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
+import static org.firstinspires.ftc.teamcode.Constants.openClaw;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper.controlState.*;
@@ -273,9 +275,9 @@ public class PracticeTeleop extends CommandOpMode {
 
         //Inputs for the claw clipper
         driver2.getGamepadButton(A)
-                .whenPressed(new RotateClipperClaw(clipperClaw, .6));
+                .whenPressed(new RotateClipperClaw(clipperClaw, closedClaw));
         driver2.getGamepadButton(B)
-                .whenPressed(new RotateClipperClaw(clipperClaw, .35));
+                .whenPressed(new RotateClipperClaw(clipperClaw, openClaw));
 
         //Pid controls
 
@@ -287,14 +289,14 @@ public class PracticeTeleop extends CommandOpMode {
                         new ParallelCommandGroup(
                                 new liftArmClipper(armLiftClipper, 1, PICK_UP_CLIPPER),
                                 new WaitUntilCommand(() -> armLiftClipper.isAtPosition(16.75)).andThen(
-                                        new RotateClipperClaw(clipperClaw, .35))
+                                        new RotateClipperClaw(clipperClaw, openClaw))
                         )
                 );
 
         new Trigger(() -> currentClipperStates == ClipperStates.STATE_TWO)
                 .whenActive(
                         new ParallelCommandGroup(
-                                new RotateClipperClaw(clipperClaw, .6),
+                                new RotateClipperClaw(clipperClaw, closedClaw),
                                 new liftArmClipper(armLiftClipper, 1, PLACE_CLIPPER)
                         )
                 );

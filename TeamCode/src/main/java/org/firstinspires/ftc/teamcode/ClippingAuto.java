@@ -15,6 +15,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TurnConstraints;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -104,14 +105,33 @@ public class ClippingAuto extends CommandOpMode {
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraint = new ProfileAccelConstraint(-25, 40);
 
+        TurnConstraints turnConstraintsFast = new TurnConstraints(3.65, -Math.PI, Math.PI);
+        VelConstraint velConstraintFast = new MinVelConstraint(Arrays.asList(
+                drivetrain.kinematics.new WheelVelConstraint(80),
+                new AngularVelConstraint(Math.PI)));
+        AccelConstraint accelConstraintFast = new ProfileAccelConstraint(-35, 50);
+
         TrajectoryActionBuilder placeFirstClip = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)), turnConstraints, velConstraint, accelConstraint)
-                .splineToLinearHeading(new Pose2d(30, -5, Math.toRadians(180)), Math.toRadians(0));
+                .splineToLinearHeading(new Pose2d(30.5, -5, Math.toRadians(180)), Math.toRadians(0));
 
-        TrajectoryActionBuilder setUpPush = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
+        TrajectoryActionBuilder setUpPush = drivetrain.actionBuilder(new Pose2d(30.5, -5, Math.toRadians(180)), turnConstraintsFast, velConstraintFast, accelConstraintFast)
+                //Start Push pos
+                .strafeToConstantHeading(new Vector2d(29, 27))
 
-        TrajectoryActionBuilder prePushFirstBlock = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
+//                .splineToLinearHeading(new Pose2d(-32, 6, Math.toRadians(-90)), Math.toRadians(-135))
+                //Set up for first push
+                .strafeToConstantHeading(new Vector2d(37, 27))
+                //Push first block
+//                .splineToLinearHeading(new Pose2d(-20, -3, Math.toRadians(-90)), Math.toRadians(-135))
+//                .strafeToConstantHeading(new Vector2d(-20, -15))
+                //Set up for second push
+//                .strafeToConstantHeading(new Vector2d(0, 0))
+                //Push second block
+//                .strafeToConstantHeading(new Vector2d(0, 0))
+                ;
+
+        TrajectoryActionBuilder prePushFirstBlock = drivetrain.actionBuilder(new Pose2d(-25, 5, Math.toRadians(-90)))
+                .strafeToConstantHeading(new Vector2d(-50, 0));
 
         TrajectoryActionBuilder PushFirstBlock = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
                 .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
@@ -142,9 +162,10 @@ public class ClippingAuto extends CommandOpMode {
                 new ParallelCommandGroup(
                         new ClipFirstBlockAuto(armLiftClipper, clipperClaw),
                         new FollowDrivePath(drivetrain, placeFirstClip.build())
-                )
+                ),
+                new FollowDrivePath(drivetrain, setUpPush.build())
 
-                ));
+        ));
 
 
     }

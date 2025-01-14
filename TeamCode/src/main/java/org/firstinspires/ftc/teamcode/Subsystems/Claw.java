@@ -33,6 +33,9 @@ public class Claw implements Subsystem {
     }
 
     public boolean getTouchSensor() {
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Touch State", touchSensor.getState());
+        dashboard.sendTelemetryPacket(packet);
         return !touchSensor.getState();
     }
 

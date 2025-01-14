@@ -3,9 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PICK_UP_ROTATE;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PLACE_ROTATE;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.PRE_PICK_UP_ROTATE;
 import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.TUCK_ROTATE;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -14,17 +11,14 @@ import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
-import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TurnConstraints;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
-import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAuto;
@@ -45,8 +39,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
 import java.util.Arrays;
 
-@Autonomous(name = "HighBasketBlue", group = "ScrapHeads")
-public class HighBasketBlue extends CommandOpMode {
+@Autonomous(name = "HighBasketAuto", group = "ScrapHeads")
+public class HighBasketAuto extends CommandOpMode {
     //Creating all the variables used in the code
     //Creating drivetrain
     Drivetrain drivetrain = null;
