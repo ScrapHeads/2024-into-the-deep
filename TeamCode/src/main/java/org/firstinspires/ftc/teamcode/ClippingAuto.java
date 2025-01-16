@@ -116,14 +116,14 @@ public class ClippingAuto extends CommandOpMode {
 
         TrajectoryActionBuilder setUpPush = drivetrain.actionBuilder(new Pose2d(30.5, -5, Math.toRadians(180)), turnConstraintsFast, velConstraintFast, accelConstraintFast)
                 //Start Push pos
-                .strafeToConstantHeading(new Vector2d(29, 27))
+                .strafeToLinearHeading(new Vector2d(29, 27), Math.toRadians(180))
 
 //                .splineToLinearHeading(new Pose2d(-32, 6, Math.toRadians(-90)), Math.toRadians(-135))
                 //Set up for first push
-                .strafeToConstantHeading(new Vector2d(37, 27))
+                .strafeToConstantHeading(new Vector2d(46, 27))
                 //Push first block
-//                .splineToLinearHeading(new Pose2d(-20, -3, Math.toRadians(-90)), Math.toRadians(-135))
-//                .strafeToConstantHeading(new Vector2d(-20, -15))
+//                .splineToLinearHeading(new Pose2d(40, 0, Math.toRadians(-90)), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(0, 28), Math.toRadians(-90))
                 //Set up for second push
 //                .strafeToConstantHeading(new Vector2d(0, 0))
                 //Push second block
