@@ -105,7 +105,7 @@ public class ClippingAuto extends CommandOpMode {
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraint = new ProfileAccelConstraint(-25, 40);
 
-        TurnConstraints turnConstraintsFast = new TurnConstraints(3.65, -Math.PI, Math.PI);
+        TurnConstraints turnConstraintsFast = new TurnConstraints(3.6, -Math.PI, Math.PI);
         VelConstraint velConstraintFast = new MinVelConstraint(Arrays.asList(
                 drivetrain.kinematics.new WheelVelConstraint(80),
                 new AngularVelConstraint(Math.PI)));
@@ -116,18 +116,22 @@ public class ClippingAuto extends CommandOpMode {
 
         TrajectoryActionBuilder setUpPush = drivetrain.actionBuilder(new Pose2d(30.5, -5, Math.toRadians(180)), turnConstraintsFast, velConstraintFast, accelConstraintFast)
                 //Start Push pos
-                .strafeToLinearHeading(new Vector2d(29, 27), Math.toRadians(180))
+//                .strafeToLinearHeading(new Vector2d(29, 27), Math.toRadians(180))
 
-//                .splineToLinearHeading(new Pose2d(-32, 6, Math.toRadians(-90)), Math.toRadians(-135))
+                .splineToLinearHeading(new Pose2d(-30, 13, Math.toRadians(-90)), Math.toRadians(-135))
                 //Set up for first push
-                .strafeToConstantHeading(new Vector2d(46, 27))
+                .strafeToConstantHeading(new Vector2d(-54, 9.5))
+                .strafeToLinearHeading(new Vector2d(-54, -1), Math.toRadians(-90))
+//                .strafeToConstantHeading(new Vector2d(46, 27))
+
                 //Push first block
 //                .splineToLinearHeading(new Pose2d(40, 0, Math.toRadians(-90)), Math.toRadians(0))
-                .strafeToLinearHeading(new Vector2d(0, 28), Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(-15, 0), Math.toRadians(-90))
                 //Set up for second push
-//                .strafeToConstantHeading(new Vector2d(0, 0))
+                .strafeToLinearHeading(new Vector2d(-55, -4), Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(-55, -14), Math.toRadians(-90))
                 //Push second block
-//                .strafeToConstantHeading(new Vector2d(0, 0))
+                .strafeToLinearHeading(new Vector2d(-15, -13), Math.toRadians(-90))
                 ;
 
         TrajectoryActionBuilder prePushFirstBlock = drivetrain.actionBuilder(new Pose2d(-25, 5, Math.toRadians(-90)))
