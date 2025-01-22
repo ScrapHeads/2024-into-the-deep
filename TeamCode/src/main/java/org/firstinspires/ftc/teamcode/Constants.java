@@ -13,7 +13,7 @@ public class Constants {
     public static Telemetry tele;
     public static FtcDashboard dashboard;
     //Originally 0
-    public static double openClaw = .7;
+    public static double openClaw = .75;
     //Originally 1
     public static double closedClaw = 1;
 }

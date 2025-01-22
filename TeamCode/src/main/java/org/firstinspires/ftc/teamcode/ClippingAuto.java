@@ -25,6 +25,7 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.Automation.ClipFirstBlockAuto;
+import org.firstinspires.ftc.teamcode.Commands.Automation.ClipSecondBlockAuto;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAuto;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAutoSecondSpikeHB;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
@@ -128,35 +129,17 @@ public class ClippingAuto extends CommandOpMode {
 //                .splineToLinearHeading(new Pose2d(40, 0, Math.toRadians(-90)), Math.toRadians(0))
                 .strafeToLinearHeading(new Vector2d(-15, 0), Math.toRadians(-90))
                 //Set up for second push
-                .strafeToLinearHeading(new Vector2d(-55, -4), Math.toRadians(-90))
-                .strafeToLinearHeading(new Vector2d(-55, -14), Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(-55, -3), Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(-55, -13), Math.toRadians(-90))
                 //Push second block
-                .strafeToLinearHeading(new Vector2d(-15, -13), Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(-15, -12), Math.toRadians(-90))
+                //Set up Push third block
+                //Push third block
                 ;
 
-        TrajectoryActionBuilder prePushFirstBlock = drivetrain.actionBuilder(new Pose2d(-25, 5, Math.toRadians(-90)))
-                .strafeToConstantHeading(new Vector2d(-50, 0));
-
-        TrajectoryActionBuilder PushFirstBlock = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
-
-        TrajectoryActionBuilder prePushSecondBlock = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
-
-        TrajectoryActionBuilder pushSecondBlock = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
-
-        TrajectoryActionBuilder prePushThirdBlock = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
-
-        TrajectoryActionBuilder pushThirdBlock = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
-
-        TrajectoryActionBuilder setUpClipping = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
-
-        TrajectoryActionBuilder pickUpSecondClip = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(0)), Math.toRadians(0));
+        TrajectoryActionBuilder pickUpSecondClip = drivetrain.actionBuilder(new Pose2d(-15, -13, Math.toRadians(-90)), turnConstraintsFast, velConstraintFast, accelConstraintFast)
+//                .splineToLinearHeading(new Pose2d(-10, 30, Math.toRadians(0)), Math.toRadians(0));
+                .strafeToLinearHeading(new Vector2d(-67, -13), Math.toRadians(0));
 
         TrajectoryActionBuilder placeSecondClip = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
                 .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
@@ -167,7 +150,12 @@ public class ClippingAuto extends CommandOpMode {
                         new ClipFirstBlockAuto(armLiftClipper, clipperClaw),
                         new FollowDrivePath(drivetrain, placeFirstClip.build())
                 ),
-                new FollowDrivePath(drivetrain, setUpPush.build())
+                new FollowDrivePath(drivetrain, setUpPush.build()),
+
+                new ParallelCommandGroup(
+                        new FollowDrivePath(drivetrain, pickUpSecondClip.build()),
+                        new ClipSecondBlockAuto(armLiftClipper, clipperClaw)
+                )
 
         ));
 
