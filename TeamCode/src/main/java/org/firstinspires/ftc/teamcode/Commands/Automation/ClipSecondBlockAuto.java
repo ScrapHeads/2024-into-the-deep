@@ -20,7 +20,7 @@ public class ClipSecondBlockAuto extends SequentialCommandGroup {
     public ClipSecondBlockAuto(ArmLiftClipper clipperArm, ClipperClaw clipperClaw) {
         addCommands(
             new liftArmClipper(clipperArm, 1, PICK_UP_CLIPPER),
-            new WaitCommand(1570),
+            new WaitCommand(1550),
             new RotateClipperClaw(clipperClaw, closedClaw),
             new liftArmClipper(clipperArm, 1, PLACE_CLIPPER)
 //            new WaitCommand(1700),

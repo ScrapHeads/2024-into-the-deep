@@ -121,7 +121,7 @@ public class ClippingAuto extends CommandOpMode {
 
                 .splineToLinearHeading(new Pose2d(-30, 13, Math.toRadians(-90)), Math.toRadians(-135))
                 //Set up for first push
-                .strafeToConstantHeading(new Vector2d(-54, 9.5))
+                .strafeToConstantHeading(new Vector2d(-54, 11))
                 .strafeToLinearHeading(new Vector2d(-54, -1), Math.toRadians(-90))
 //                .strafeToConstantHeading(new Vector2d(46, 27))
 
@@ -141,8 +141,8 @@ public class ClippingAuto extends CommandOpMode {
 //                .splineToLinearHeading(new Pose2d(-10, 30, Math.toRadians(0)), Math.toRadians(0));
                 .strafeToLinearHeading(new Vector2d(-67, -13), Math.toRadians(0));
 
-        TrajectoryActionBuilder placeSecondClip = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
-                .splineToLinearHeading(new Pose2d(0, 0, Math.toRadians(90)), Math.toRadians(0));
+        TrajectoryActionBuilder placeSecondClip = drivetrain.actionBuilder(new Pose2d(-67, -13, Math.toRadians(0)), turnConstraintsFast, velConstraintFast, accelConstraintFast)
+                .splineToLinearHeading(new Pose2d(-15, 8, Math.toRadians(180)), Math.toRadians(180));
 
         schedule(new SequentialCommandGroup(
 
@@ -155,7 +155,8 @@ public class ClippingAuto extends CommandOpMode {
                 new ParallelCommandGroup(
                         new FollowDrivePath(drivetrain, pickUpSecondClip.build()),
                         new ClipSecondBlockAuto(armLiftClipper, clipperClaw)
-                )
+                ),
+                new FollowDrivePath(drivetrain, placeSecondClip.build())
 
         ));
 
