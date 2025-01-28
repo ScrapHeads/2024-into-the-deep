@@ -22,7 +22,7 @@ public class ClipFirstBlockAuto extends SequentialCommandGroup {
             new RotateClipperClaw(clipperClaw, closedClaw),
             new WaitCommand(1700),
             new liftArmClipper(clipperArm, 1, PICK_UP_CLIPPER),
-            new WaitUntilCommand(() -> clipperArm.isAtPosition(17.5)).andThen(
+            new WaitUntilCommand(() -> clipperArm.isAtPosition(18.5)).andThen(
                 new RotateClipperClaw(clipperClaw, openClaw)),
             new liftArmClipper(clipperArm, 1, RESET_CLIPPER)
 

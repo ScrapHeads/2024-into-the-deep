@@ -197,7 +197,7 @@ public class MainTeleopClipper extends CommandOpMode {
 
         //Inputs for the armLiftIntake
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1)
-                .whenActive(new liftArmIntake(armLiftIntake, .75, MANUAL_LIFT))
+                .whenActive(new liftArmIntake(armLiftIntake, .75, MANUAL_REVERSE))
                 .whenInactive(new liftArmIntake(armLiftIntake, 0, HOLD_LIFT));
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1)
