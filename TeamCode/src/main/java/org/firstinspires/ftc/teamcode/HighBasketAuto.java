@@ -11,8 +11,10 @@ import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
+import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TurnConstraints;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -25,6 +27,7 @@ import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAuto;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAutoSecondSpikeHB;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAutoThirdSpikeHB;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
+import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHBAutoEnd;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHBTele;
 import org.firstinspires.ftc.teamcode.Commands.Automation.PrePlaceHBAuto;
 import org.firstinspires.ftc.teamcode.Commands.FollowDrivePath;
@@ -107,31 +110,31 @@ public class HighBasketAuto extends CommandOpMode {
         AccelConstraint accelConstraint = new ProfileAccelConstraint(-25, 40);
 
         TrajectoryActionBuilder pickUpPreFirstBlock = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                .splineToLinearHeading(new Pose2d(16, 34.5, Math.toRadians(-45)), Math.toRadians(-45));
+                .splineToLinearHeading(new Pose2d(15, 35.5, Math.toRadians(-45)), Math.toRadians(-45));
 
         TrajectoryActionBuilder pickUpFirstBlock = drivetrain.actionBuilder(new Pose2d(16, 34.5, Math.toRadians(-45)), turnConstraints, velConstraint, accelConstraint)
-                .splineToLinearHeading(new Pose2d(27, 26, Math.toRadians(-45)), Math.toRadians(0));
+                .splineToLinearHeading(new Pose2d(27, 28, Math.toRadians(-45)), Math.toRadians(0));
 
         TrajectoryActionBuilder placeFirstBlock = drivetrain.actionBuilder(new Pose2d(26, 27, Math.toRadians(-45)), turnConstraints, velConstraint, accelConstraint)
                 .splineToLinearHeading(new Pose2d(41, -4, Math.toRadians(45)), Math.toRadians(45));
 
         TrajectoryActionBuilder pickUpPreSecondBlock = drivetrain.actionBuilder(new Pose2d(41, -4, Math.toRadians(45)))
-                .splineToLinearHeading(new Pose2d(25, 28, Math.toRadians(-45)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(23, 28, Math.toRadians(-45)), Math.toRadians(90));
 
         TrajectoryActionBuilder pickUpSecondBlock = drivetrain.actionBuilder(new Pose2d(25, 28, Math.toRadians(-45)), turnConstraints, velConstraint, accelConstraint)
-                .splineToLinearHeading(new Pose2d(33, 23, Math.toRadians(-45)), Math.toRadians(0));
+                .splineToLinearHeading(new Pose2d(37, 23, Math.toRadians(-45)), Math.toRadians(0));
 
         TrajectoryActionBuilder placeSecondBlock = drivetrain.actionBuilder(new Pose2d(33, 23, Math.toRadians(-45)), turnConstraints, velConstraint, accelConstraint)
-                .splineToLinearHeading(new Pose2d(35, -8, Math.toRadians(45)), Math.toRadians(45));
+                .splineToLinearHeading(new Pose2d(39, -1, Math.toRadians(45)), Math.toRadians(45));
 
         TrajectoryActionBuilder pickUpPreThirdBlock = drivetrain.actionBuilder(new Pose2d(35, -8, Math.toRadians(45)))
-                .splineToLinearHeading(new Pose2d(16, 17, Math.toRadians(0)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(22, 14, Math.toRadians(0)), Math.toRadians(90));
 
         TrajectoryActionBuilder pickUpThirdBlock = drivetrain.actionBuilder(new Pose2d(16, 17, Math.toRadians(0)), turnConstraints, velConstraint, accelConstraint)
-                .splineToLinearHeading(new Pose2d(19, 17, Math.toRadians(0)), Math.toRadians(0));
+                .splineToLinearHeading(new Pose2d(25, 14, Math.toRadians(0)), Math.toRadians(0));
 
         TrajectoryActionBuilder placeThirdBlock = drivetrain.actionBuilder(new Pose2d(16, 17, Math.toRadians(0)), turnConstraints, velConstraint, accelConstraint)
-                .splineToLinearHeading(new Pose2d(40, -7, Math.toRadians(45)), Math.toRadians(0));
+                .splineToLinearHeading(new Pose2d(48.5, 0, Math.toRadians(45)), Math.toRadians(0));
 
         schedule(new SequentialCommandGroup(
 
@@ -176,7 +179,7 @@ public class HighBasketAuto extends CommandOpMode {
                         new FollowDrivePath(drivetrain, placeSecondBlock.build())
                 ),
 
-                new PlacePieceHBTele(armLiftIntake, armRotateIntake, claw),
+                new PlacePieceHBAutoEnd(armLiftIntake, armRotateIntake, claw),
 
                 new ParallelCommandGroup(
                         new PickUpFloorAutoThirdSpikeHB(armRotateIntake),
@@ -196,7 +199,7 @@ public class HighBasketAuto extends CommandOpMode {
                         new FollowDrivePath(drivetrain, placeThirdBlock.build())
                 ),
 //
-                new PlacePieceHBTele(armLiftIntake, armRotateIntake, claw)
+                new PlacePieceHBAutoEnd(armLiftIntake, armRotateIntake, claw)
 
                 ));
 

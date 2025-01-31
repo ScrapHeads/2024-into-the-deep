@@ -23,6 +23,7 @@ public class ArmLiftIntake implements Subsystem {
 
     public enum controlState {
         PLACE_LIFT(33),
+        PLACE_LIFT_EXTEND(36),
         PICK_UP_LIFT(3),
         RESET_LIFT(0),
         MANUAL_LIFT(-2),
@@ -57,7 +58,7 @@ public class ArmLiftIntake implements Subsystem {
         //Setting the configuration for the motor
         armLiftIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-        pidController.setTolerance(.5);
+        pidController.setTolerance(.25);
     }
 
     @Override
@@ -72,19 +73,22 @@ public class ArmLiftIntake implements Subsystem {
         double maxExtensionIn = getMaxExtensionIn();
 
         switch (currentState) {
+            case MANUAL_REVERSE:
+                setPower(manualPower, controlState.MANUAL_REVERSE);
+                return;
             case MANUAL_LIFT:
                 pidController.setSetPoint(maxExtensionIn);
                 break;
 //                setPower(manualPower, controlState.MANUAL_LIFT);
 //                return;
-            case MANUAL_REVERSE:
-                setPower(manualPower, controlState.MANUAL_LIFT);
-                return;
             case PICK_UP_LIFT:
                 pidController.setSetPoint(controlState.PICK_UP_LIFT.pos);
                 break;
             case PLACE_LIFT:
                 pidController.setSetPoint(controlState.PLACE_LIFT.pos);
+                break;
+            case PLACE_LIFT_EXTEND:
+                pidController.setSetPoint(controlState.PLACE_LIFT_EXTEND.pos);
                 break;
             case PRE_PLACE_AUTO:
                 pidController.setSetPoint(controlState.PRE_PLACE_AUTO.pos);
@@ -119,7 +123,7 @@ public class ArmLiftIntake implements Subsystem {
         random.put("lift output", output);
         packet.put("Max Extension", maxExtensionIn);
         packet.put("Current Extension", currentExtension);
-        packet.put("Current State", currentState);
+        random.put("Current State", currentState);
         dashboard.sendTelemetryPacket(random);
     }
 
@@ -161,6 +165,8 @@ public class ArmLiftIntake implements Subsystem {
         }
         else if (currentState == controlState.PLACE_LIFT) {
             pidController.setSetPoint(controlState.PLACE_LIFT.pos);
+        }else if (currentState == controlState.PLACE_LIFT_EXTEND) {
+            pidController.setSetPoint(controlState.PLACE_LIFT_EXTEND.pos);
         } else if (currentState == controlState.RESET_LIFT) {
             pidController.setSetPoint(controlState.RESET_LIFT.pos);
         } else if (currentState == controlState.PRE_PLACE_AUTO) {

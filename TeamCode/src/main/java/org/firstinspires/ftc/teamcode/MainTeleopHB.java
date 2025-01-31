@@ -282,6 +282,8 @@ public class MainTeleopHB extends CommandOpMode {
                 .whenPressed(new intakeClaw(claw, -1))
                 .whenReleased(new intakeClaw(claw, 0));
 
+        driver.getGamepadButton(RIGHT_BUMPER)
+                .whenPressed(new PlaceSampleZone(armRotateIntake, claw));
 
         //Statements for in game functions controller TWO
 

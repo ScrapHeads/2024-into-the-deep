@@ -159,7 +159,6 @@ public class ClippingAuto extends CommandOpMode {
                         new ClipSecondBlockAuto(armLiftClipper, clipperClaw)
                 )
 //                new FollowDrivePath(drivetrain, placeSecondClip.build())
-
         ));
 
 
