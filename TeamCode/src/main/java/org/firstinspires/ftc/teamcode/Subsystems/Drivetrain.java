@@ -39,10 +39,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.util.Localizer;
 import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
@@ -113,6 +116,18 @@ public final class Drivetrain implements Subsystem {
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
 
     public final DcMotorEx leftFront, leftBack, rightBack, rightFront;
+
+    //TODO Make PinPoint code work
+//    public final I2cDevice pinpoint;
+
+//    public int par = 0;
+
+
+
+
+
+
+
 
     public final VoltageSensor voltageSensor;
 
@@ -227,6 +242,9 @@ public final class Drivetrain implements Subsystem {
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+
+//        pinpoint = hardwareMap.get(I2cDevice.class, "pinpoint");
+
 
 //        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

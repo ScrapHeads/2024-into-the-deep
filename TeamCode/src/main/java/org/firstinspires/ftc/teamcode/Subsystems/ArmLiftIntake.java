@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import java.util.function.Supplier;
 
@@ -20,6 +21,8 @@ public class ArmLiftIntake implements Subsystem {
     //Designating the armLift variable to be set in the Arm function
     private final MotorEx armLiftIntake;
     private Supplier<Rotation2d> rotSupplier;
+
+    private final DigitalChannel touchSensor;
 
     public enum controlState {
         PLACE_LIFT(33),
@@ -59,6 +62,8 @@ public class ArmLiftIntake implements Subsystem {
         armLiftIntake.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         pidController.setTolerance(.25);
+
+        touchSensor = hm.get(DigitalChannel.class, "armLiftReset");
     }
 
     @Override
@@ -111,6 +116,13 @@ public class ArmLiftIntake implements Subsystem {
         }
 
         double currentExtension = Math.abs(armLiftIntake.getCurrentPosition() / ticksToInches);
+
+        if (getTouchSensor()) {
+            armLiftIntake.resetEncoder();
+            currentExtension = Math.abs(armLiftIntake.getCurrentPosition() / ticksToInches);
+            savedPosition = Math.abs(armLiftIntake.getCurrentPosition() / ticksToInches);
+        }
+
         double output = -pidController.calculate(currentExtension);
 
         if (pidController.atSetPoint()) {
@@ -209,6 +221,14 @@ public class ArmLiftIntake implements Subsystem {
         double curPos = Math.abs(armLiftIntake.getCurrentPosition() / ticksToInches);
         double desiredPos = currentState.pos;
         return Math.abs(curPos - desiredPos) <= tolerance;
+    }
+
+    public boolean getTouchSensor() {
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Arm Lift Touch", touchSensor.getState());
+        dashboard.sendTelemetryPacket(packet);
+
+        return !touchSensor.getState();
     }
 
 }

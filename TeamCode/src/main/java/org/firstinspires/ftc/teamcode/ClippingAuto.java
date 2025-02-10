@@ -152,12 +152,12 @@ public class ClippingAuto extends CommandOpMode {
                         new ClipFirstBlockAuto(armLiftClipper, clipperClaw),
                         new FollowDrivePath(drivetrain, placeFirstClip.build())
                 ),
-                new FollowDrivePath(drivetrain, setUpPush.build()),
+                new FollowDrivePath(drivetrain, setUpPush.build())
 
-                new ParallelCommandGroup(
-                        new FollowDrivePath(drivetrain, pickUpSecondClip.build()),
-                        new ClipSecondBlockAuto(armLiftClipper, clipperClaw)
-                )
+//                new ParallelCommandGroup(
+//                        new FollowDrivePath(drivetrain, pickUpSecondClip.build()),
+//                        new ClipSecondBlockAuto(armLiftClipper, clipperClaw)
+//                )
 //                new FollowDrivePath(drivetrain, placeSecondClip.build())
         ));
 

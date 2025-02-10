@@ -11,6 +11,7 @@ import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 public class ArmRotateIntake implements Subsystem {
     private static final double gearRatio = 10.0;
@@ -25,6 +26,8 @@ public class ArmRotateIntake implements Subsystem {
     private final PIDController pidController = new PIDController(0.05, 0, 0);
 
     private final ProfiledPIDController pickUpPidController = new ProfiledPIDController(0.1, 0.001, 0.002, new TrapezoidProfile.Constraints(50, 90));
+
+    private final DigitalChannel touchSensor;
 
     public enum controlState {
         PLACE_ROTATE(73),
@@ -67,6 +70,8 @@ public class ArmRotateIntake implements Subsystem {
         pidController.reset();
         pickUpPidController.setTolerance(1);
         pickUpPidController.reset();
+
+        touchSensor = hm.get(DigitalChannel.class, "armRotateReset");
     }
 
     @Override
@@ -119,6 +124,12 @@ public class ArmRotateIntake implements Subsystem {
 
         double startingOffset = 2121;
         double currentDegrees = new Rotation2d((armRotateIntake.getCurrentPosition() + startingOffset) * radiansPerTick).getDegrees();
+
+        if (getTouchSensor()) {
+            armRotateIntake.resetEncoder();
+            currentDegrees = new Rotation2d((armRotateIntake.getCurrentPosition() + startingOffset) * radiansPerTick).getDegrees();;
+            savedPosition = new Rotation2d((armRotateIntake.getCurrentPosition() + startingOffset) * radiansPerTick).getDegrees();;
+        }
 
         output = isProfiled ? pickUpPidController.calculate(currentDegrees) + feedForward : pidController.calculate(currentDegrees);
 
@@ -176,5 +187,12 @@ public class ArmRotateIntake implements Subsystem {
         double curPos = getRot().getDegrees();
         double desiredPos = currentState.pos;
         return Math.abs(curPos - desiredPos) <= tolerance;
+    }
+
+    public boolean getTouchSensor() {
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Arm Rotate Touch", touchSensor.getState());
+        dashboard.sendTelemetryPacket(packet);
+        return !touchSensor.getState();
     }
 }
