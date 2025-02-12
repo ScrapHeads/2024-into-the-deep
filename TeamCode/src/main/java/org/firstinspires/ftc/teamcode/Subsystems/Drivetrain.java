@@ -45,8 +45,11 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.util.Localizer;
 import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
@@ -66,15 +69,18 @@ public final class Drivetrain implements Subsystem {
         // IMU orientation
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
-        public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+//        public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
+//                RevHubOrientationOnRobot.LogoFacingDirection.UP;
+//        public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
+//                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
         public double inPerTick = (3.5 * Math.PI / 2000) * 0.36020518; // diameter * PI / Ticks per rev
         public double lateralInPerTick = -0.0016543692427281995;
         public double trackWidthTicks = 6670.589129164515;
+
+        //odo to convert millimeters to inches, you divide the millimeters by millyInInch when implementing
+        public double millyInInch = 25.4;
 
         // feedforward parameters (in tick units)
         public double kS = 1.1003591512385453;
@@ -107,6 +113,7 @@ public final class Drivetrain implements Subsystem {
 
     public final TurnConstraints defaultTurnConstraints = new TurnConstraints(
             PARAMS.maxAngVel, -PARAMS.maxAngAccel, PARAMS.maxAngAccel);
+
     public final VelConstraint defaultVelConstraint =
             new MinVelConstraint(Arrays.asList(
                     kinematics.new WheelVelConstraint(PARAMS.maxWheelVel),
@@ -117,24 +124,15 @@ public final class Drivetrain implements Subsystem {
 
     public final DcMotorEx leftFront, leftBack, rightBack, rightFront;
 
-    //TODO Make PinPoint code work
-//    public final I2cDevice pinpoint;
-
-//    public int par = 0;
-
-
-
-
-
-
-
-
     public final VoltageSensor voltageSensor;
 
-    public final LazyImu lazyImu;
+//    public final LazyImu lazyImu;
+
+    public final GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
 
     public final Localizer localizer;
     public Pose2d pose;
+
 
     private final LinkedList<Pose2d> poseHistory = new LinkedList<>();
 
@@ -145,7 +143,8 @@ public final class Drivetrain implements Subsystem {
 
     public class DriveLocalizer implements Localizer {
         public final Encoder leftFront, leftBack, rightBack, rightFront;
-        public final IMU imu;
+
+//        public final IMU imu;
 
         private int lastLeftFrontPos, lastLeftBackPos, lastRightBackPos, lastRightFrontPos;
         private Rotation2d lastHeading;
@@ -157,7 +156,7 @@ public final class Drivetrain implements Subsystem {
             rightBack = new OverflowEncoder(new RawEncoder(Drivetrain.this.rightBack));
             rightFront = new OverflowEncoder(new RawEncoder(Drivetrain.this.rightFront));
 
-            imu = lazyImu.get();
+//            imu = lazyImu.get();
 
             // TODO: reverse encoders if needed
             //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -170,12 +169,14 @@ public final class Drivetrain implements Subsystem {
             PositionVelocityPair rightBackPosVel = rightBack.getPositionAndVelocity();
             PositionVelocityPair rightFrontPosVel = rightFront.getPositionAndVelocity();
 
-            YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
+//            YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
 
             FlightRecorder.write("MECANUM_LOCALIZER_INPUTS", new MecanumLocalizerInputsMessage(
-                    leftFrontPosVel, leftBackPosVel, rightBackPosVel, rightFrontPosVel, angles));
+                    leftFrontPosVel, leftBackPosVel, rightBackPosVel, rightFrontPosVel, odo));
 
-            Rotation2d heading = Rotation2d.exp(angles.getYaw(AngleUnit.RADIANS));
+//            Rotation2d heading = Rotation2d.exp(angles.getYaw(AngleUnit.RADIANS));
+            Rotation2d heading = Rotation2d.exp(odo.getHeading());
+
 
             if (!initialized) {
                 initialized = true;
@@ -257,12 +258,24 @@ public final class Drivetrain implements Subsystem {
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        lazyImu = new LazyImu(hardwareMap, "imu", new RevHubOrientationOnRobot(
-                PARAMS.logoFacingDirection, PARAMS.usbFacingDirection));
+//        lazyImu = new LazyImu(hardwareMap, "imu", new RevHubOrientationOnRobot(
+//                PARAMS.logoFacingDirection, PARAMS.usbFacingDirection));
+
+        odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
+
+        odo.setOffsets(-156, 112);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+
+        odo.resetPosAndIMU();
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new TwoDeadWheelLocalizer(hardwareMap, lazyImu.get(), PARAMS.inPerTick);
+        odo.update();
+
+        Pose2D pos = odo.getPosition();
+
+        localizer = new TwoDeadWheelLocalizer(hardwareMap, odo, PARAMS.inPerTick);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
@@ -280,6 +293,20 @@ public final class Drivetrain implements Subsystem {
         leftBack.setPower(wheelVels.leftBack.get(0) / maxPowerMag);
         rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
         rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
+
+        TelemetryPacket p = new TelemetryPacket();
+
+        p.put("x", pose.position.x);
+        p.put("y", pose.position.y);
+        p.put("heading (deg)", Math.toDegrees(pose.heading.toDouble()));
+
+        Pose2D pos = odo.getPosition();
+
+        p.put("odo x", pos.getX(DistanceUnit.INCH));
+        p.put("odo y", pos.getY(DistanceUnit.INCH));
+        p.put("odo heading (deg)", Math.toDegrees(odo.getHeading()));
+
+        dashboard.sendTelemetryPacket(p);
     }
 
     public final class FollowTrajectoryAction implements Action {
@@ -352,14 +379,19 @@ public final class Drivetrain implements Subsystem {
             rightBack.setPower(rightBackPower);
             rightFront.setPower(rightFrontPower);
 
-            p.put("x", pose.position.x);
-            p.put("y", pose.position.y);
-            p.put("heading (deg)", Math.toDegrees(pose.heading.toDouble()));
+//            p.put("x", pose.position.x);
+//            p.put("y", pose.position.y);
+//            p.put("heading (deg)", Math.toDegrees(pose.heading.toDouble()));
+//
 
+            Pose2D pos = odo.getPosition();
             Pose2d error = txWorldTarget.value().minusExp(pose);
+            p.put("odo x", pos.getX(DistanceUnit.INCH));
             p.put("xError", error.position.x);
             p.put("yError", error.position.y);
             p.put("headingError (deg)", Math.toDegrees(error.heading.toDouble()));
+
+            dashboard.sendTelemetryPacket(p);
 
             // only draw when active; only one drive action should be active at a time
             Canvas c = p.fieldOverlay();

@@ -72,7 +72,7 @@ public class TestAuto extends CommandOpMode {
         dashboard = FtcDashboard.getInstance();
 
         // Might need to change pose2d for field centric reasons, will need to change for autos
-        drivetrain = new Drivetrain(hardwareMap, new Pose2d(10, -63, 90));
+        drivetrain = new Drivetrain(hardwareMap, new Pose2d(0, 0, 0));
         drivetrain.register();
 
         //Initializing the climber
@@ -99,8 +99,8 @@ public class TestAuto extends CommandOpMode {
 //        armRotateClipper = new ArmRotateClipper();
 //        armRotateClipper.register();
 
-        TrajectoryActionBuilder testTrajectory = drivetrain.actionBuilder(new Pose2d(10, -63, 90))
-                .splineToLinearHeading(new Pose2d(6, -34, 90), 0);
+        TrajectoryActionBuilder testTrajectory = drivetrain.actionBuilder(new Pose2d(0, 0, 0))
+                .splineToLinearHeading(new Pose2d(10, 0, 0), 0);
 
         TrajectoryActionBuilder nextTrajectory = drivetrain.actionBuilder(new Pose2d(6, -34, 90))
                 .splineToLinearHeading(new Pose2d(-38, -40, 90), 0)
@@ -109,20 +109,21 @@ public class TestAuto extends CommandOpMode {
 
         schedule(new SequentialCommandGroup(
 
+                new FollowDrivePath(drivetrain, testTrajectory.build())
+
 //                new FollowDrivePath(drivetrain, testTrajectory.build()),
 //                new FollowDrivePath(drivetrain, nextTrajectory.build()),
 
-        new ParallelCommandGroup(
-                new FollowDrivePath(drivetrain, testTrajectory.build())
-//                new intakeClaw(claw, 1)
-
-                ),
-        new ParallelCommandGroup(
-                new FollowDrivePath(drivetrain, nextTrajectory.build())
-//                new intakeClaw(claw, 1)
-                )
-//                new WaitCommand(500),
-//                new intakeClaw(claw, 0)
+//        new ParallelCommandGroup(
+////                new intakeClaw(claw, 1)
+//
+//                ),
+//        new ParallelCommandGroup(
+//                new FollowDrivePath(drivetrain, nextTrajectory.build())
+////                new intakeClaw(claw, 1)
+//                )
+////                new WaitCommand(500),
+////                new intakeClaw(claw, 0)
         ));
 
 

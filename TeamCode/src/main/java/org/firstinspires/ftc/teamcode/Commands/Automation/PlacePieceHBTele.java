@@ -28,7 +28,7 @@ public class PlacePieceHBTele extends SequentialCommandGroup {
                 new RotateArmIntake(rotation, 1, HB_AFTER),
                 new WaitUntilCommand(() -> rotation.isAtPosition(15)),
                 new liftArmIntake(lift, 1, RESET_LIFT),
-                new WaitUntilCommand(() -> lift.isAtPosition(12)),
+                new WaitUntilCommand(() -> lift.isAtPosition(10)),
                 new RotateArmIntake(rotation, 1, FINISH_ROTATE)
 
         );
