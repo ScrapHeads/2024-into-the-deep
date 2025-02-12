@@ -1,11 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.auto;
 
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake.controlState.TUCK_ROTATE;
-
-import static org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper.controlState.*;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.AccelConstraint;
@@ -18,23 +15,12 @@ import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.Automation.ClipFirstBlockAuto;
-import org.firstinspires.ftc.teamcode.Commands.Automation.ClipSecondBlockAuto;
-import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAuto;
-import org.firstinspires.ftc.teamcode.Commands.Automation.PickUpFloorAutoSecondSpikeHB;
-import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHB;
-import org.firstinspires.ftc.teamcode.Commands.Automation.PlacePieceHBTele;
-import org.firstinspires.ftc.teamcode.Commands.Automation.PrePlaceHBAuto;
 import org.firstinspires.ftc.teamcode.Commands.FollowDrivePath;
-import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
-import org.firstinspires.ftc.teamcode.Commands.RotateClipperClaw;
-import org.firstinspires.ftc.teamcode.Commands.liftArmClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateClipper;

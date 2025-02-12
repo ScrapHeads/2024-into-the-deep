@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.teleops;
 
 import static org.firstinspires.ftc.teamcode.Constants.closedClaw;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;

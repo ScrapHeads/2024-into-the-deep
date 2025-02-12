@@ -1,37 +1,17 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.auto;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
-import com.arcrobotics.ftclib.command.button.Trigger;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.FollowDrivePath;
-import org.firstinspires.ftc.teamcode.Commands.RotateArmIntake;
-import org.firstinspires.ftc.teamcode.Commands.intakeClaw;
-import org.firstinspires.ftc.teamcode.Commands.liftArmClipper;
-import org.firstinspires.ftc.teamcode.Commands.liftArmIntake;
-import org.firstinspires.ftc.teamcode.Commands.liftClimber;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateClipper;
@@ -100,7 +80,7 @@ public class TestAuto extends CommandOpMode {
 //        armRotateClipper.register();
 
         TrajectoryActionBuilder testTrajectory = drivetrain.actionBuilder(new Pose2d(0, 0, 0))
-                .splineToLinearHeading(new Pose2d(10, 0, 0), 0);
+                .splineToLinearHeading(new Pose2d(0, 0, 90), 0);
 
         TrajectoryActionBuilder nextTrajectory = drivetrain.actionBuilder(new Pose2d(6, -34, 90))
                 .splineToLinearHeading(new Pose2d(-38, -40, 90), 0)
