@@ -96,6 +96,18 @@ public final class TwoDeadWheelLocalizer implements Localizer {
                 0,
                 0);
 
+//        parPosVel = new PositionVelocityPair(
+//                (int) (parPosVel.position * PARAMS.parXMult),
+//                (int) (parPosVel.velocity * PARAMS.parXMult),
+//                parPosVel.rawPosition,
+//                parPosVel.rawVelocity);
+//
+//        perpPosVel = new PositionVelocityPair(
+//                (int) (perpPosVel.position * PARAMS.perpYMult),
+//                (int) (perpPosVel.velocity * PARAMS.perpYMult),
+//                perpPosVel.rawPosition,
+//                perpPosVel.rawVelocity);
+
 //        YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
         double headingRadian = odo.getHeading();
 
@@ -171,7 +183,7 @@ public final class TwoDeadWheelLocalizer implements Localizer {
                                 (odo.getVelX() / PARAMS.millyInInch) * headingVel,
                         }),
                         new DualNum<Time>(new double[] {
-                                perpPosDelta - PARAMS.perpXTicks * headingDelta,
+                                perpPosDelta * headingDelta,
                                 (odo.getVelY() / PARAMS.millyInInch) * headingVel,
                         })
                 ),
