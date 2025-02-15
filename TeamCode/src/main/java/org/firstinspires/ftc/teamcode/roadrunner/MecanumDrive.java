@@ -39,6 +39,7 @@ import com.acmerobotics.roadrunner.ftc.LynxFirmware;
 import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
 import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
+import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -62,7 +63,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Config
-public class MecanumDrive {
+public class MecanumDrive implements Subsystem {
     public static Params PARAMS = new Params();
     public final MecanumKinematics kinematics = new MecanumKinematics(
             PARAMS.inPerTick * PARAMS.trackWidthTicks, PARAMS.inPerTick / PARAMS.lateralInPerTick);
@@ -216,21 +217,21 @@ public class MecanumDrive {
 
 
         // drive model parameters
-        public double inPerTick = 1; // SparkFun OTOS Note: you can probably leave this at 1
-        public double lateralInPerTick = .8;
-        public double trackWidthTicks = 9.685526281805368;
+        public double inPerTick = (3.5 * Math.PI / 2000) * 0.36020518;
+        public double lateralInPerTick = -0.0016543692427281995;
+        public double trackWidthTicks = 6670.589129164515;
 
 
         // feedforward parameters (in tick units)
-        public double kS = 1.624191912189736;
-        public double kV = 0.18341322461809637;
-        public double kA = 0.0001;
+        public double kS = 1.1003591512385453;
+        public double kV = 0.0004;
+        public double kA = 0.00005;
 
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 50; //50
-        public double minProfileAccel = -30; //-30
-        public double maxProfileAccel = 50; //50
+        public double maxWheelVel = 40;
+        public double minProfileAccel = -30;
+        public double maxProfileAccel = 50;
 
 
         // turn profile parameters (in radians)
@@ -239,9 +240,9 @@ public class MecanumDrive {
 
 
         // path controller gains
-        public double axialGain = 8; //6.0
-        public double lateralGain = 8; //6.0
-        public double headingGain = 10; //3.0 // shared with turn
+        public double axialGain = 5.0;
+        public double lateralGain = 5.0;
+        public double headingGain = 5.8; // shared with turn
 
 
         public double axialVelGain = 0.0;
