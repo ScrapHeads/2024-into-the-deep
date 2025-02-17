@@ -59,8 +59,8 @@ public class TestAuto extends CommandOpMode {
 //        drivetrain = new Drivetrain(hardwareMap, new Pose2d(0, 0, 0));
 //        drivetrain.register();
 
-        pinpointDrive = new PinpointDrive(hardwareMap, new Pose2d(0, 0, 0));
-        pinpointDrive.register();
+        drivetrain = new Drivetrain(hardwareMap, new Pose2d(0, 0, 0));
+        drivetrain.register();
 
         //Initializing the climber
         climber = new Climber();
@@ -87,7 +87,7 @@ public class TestAuto extends CommandOpMode {
 //        armRotateClipper.register();
 
         TrajectoryActionBuilder testTrajectory = drivetrain.actionBuilder(new Pose2d(0, 0, 0))
-                .splineToLinearHeading(new Pose2d(10, 0, 0), 0);
+                .splineToLinearHeading(new Pose2d(1, 0, 90), 0);
 
         TrajectoryActionBuilder nextTrajectory = drivetrain.actionBuilder(new Pose2d(6, -34, 90))
                 .splineToLinearHeading(new Pose2d(-38, -40, 90), 0)
@@ -96,7 +96,7 @@ public class TestAuto extends CommandOpMode {
 
         schedule(new SequentialCommandGroup(
 
-                new FollowDrivePathPP(pinpointDrive, testTrajectory.build())
+                new FollowDrivePath(drivetrain, testTrajectory.build())
 
 //                new FollowDrivePath(drivetrain, testTrajectory.build()),
 //                new FollowDrivePath(drivetrain, nextTrajectory.build()),
