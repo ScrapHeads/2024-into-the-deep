@@ -87,7 +87,7 @@ public class TestAuto extends CommandOpMode {
 //        armRotateClipper.register();
 
         TrajectoryActionBuilder testTrajectory = drivetrain.actionBuilder(new Pose2d(0, 0, 0))
-                .splineToLinearHeading(new Pose2d(1, 0, 90), 0);
+                .splineToLinearHeading(new Pose2d(5, 0, 0), 0);
 
         TrajectoryActionBuilder nextTrajectory = drivetrain.actionBuilder(new Pose2d(6, -34, 90))
                 .splineToLinearHeading(new Pose2d(-38, -40, 90), 0)
