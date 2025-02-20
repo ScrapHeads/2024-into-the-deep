@@ -98,12 +98,12 @@ public class ClippingAuto extends CommandOpMode {
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraintFast = new ProfileAccelConstraint(-35, 50);
 
-        TrajectoryActionBuilder placeFirstClip = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)), turnConstraints, velConstraint, accelConstraint)
+        TrajectoryActionBuilder placeFirstClip = drivetrain.actionBuilder(new Pose2d(0, 0, Math.toRadians(180)))
 //                .splineToLinearHeading(new Pose2d(30.5, -5, Math.toRadians(180)), Math.toRadians(0))
                 .strafeToLinearHeading(new Vector2d(30.5, -5), Math.toRadians(180));
         ;
 
-        TrajectoryActionBuilder setUpPush = drivetrain.actionBuilder(new Pose2d(30.5, -5, Math.toRadians(180)), turnConstraintsFast, velConstraintFast, accelConstraintFast)
+        TrajectoryActionBuilder setUpPush = drivetrain.actionBuilder(new Pose2d(30.5, -5, Math.toRadians(180)))
                 //Start Push pos
 //                .strafeToLinearHeading(new Vector2d(29, 27), Math.toRadians(180))
 
@@ -125,11 +125,11 @@ public class ClippingAuto extends CommandOpMode {
                 //Push third block
                 ;
 
-        TrajectoryActionBuilder pickUpSecondClip = drivetrain.actionBuilder(new Pose2d(-15, -13, Math.toRadians(-90)), turnConstraintsFast, velConstraintFast, accelConstraintFast)
+        TrajectoryActionBuilder pickUpSecondClip = drivetrain.actionBuilder(new Pose2d(-15, -13, Math.toRadians(-90)))
 //                .splineToLinearHeading(new Pose2d(-10, 30, Math.toRadians(0)), Math.toRadians(0));
                 .strafeToLinearHeading(new Vector2d(-54, 8), Math.toRadians(0));
 
-        TrajectoryActionBuilder placeSecondClip = drivetrain.actionBuilder(new Pose2d(-67, -13, Math.toRadians(0)), turnConstraintsFast, velConstraintFast, accelConstraintFast)
+        TrajectoryActionBuilder placeSecondClip = drivetrain.actionBuilder(new Pose2d(-67, -13, Math.toRadians(0)))
                 .splineToLinearHeading(new Pose2d(-15, 8, Math.toRadians(180)), Math.toRadians(180));
 
         schedule(new SequentialCommandGroup(

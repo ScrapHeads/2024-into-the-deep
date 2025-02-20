@@ -12,7 +12,6 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.FollowDrivePath;
-import org.firstinspires.ftc.teamcode.Commands.FollowDrivePathPP;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftClipper;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmLiftIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateClipper;
@@ -20,15 +19,12 @@ import org.firstinspires.ftc.teamcode.Subsystems.ArmRotateIntake;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.Climber;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.roadrunner.PinpointDrive;
 
 @Autonomous(name = "TestAuto", group = "ScrapHeads")
 public class TestAuto extends CommandOpMode {
     //Creating all the variables used in the code
     //Creating drivetrain
     Drivetrain drivetrain = null;
-
-    PinpointDrive pinpointDrive = null;
 
     //Creating climber
     Climber climber = null;

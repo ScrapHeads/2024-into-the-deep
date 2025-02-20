@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.tuning;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.reflection.ReflectionConfig;
 import com.acmerobotics.roadrunner.MotorFeedforward;
@@ -9,20 +11,29 @@ import com.acmerobotics.roadrunner.ftc.DeadWheelDirectionDebugger;
 import com.acmerobotics.roadrunner.ftc.DriveType;
 import com.acmerobotics.roadrunner.ftc.DriveView;
 import com.acmerobotics.roadrunner.ftc.DriveViewFactory;
-import com.acmerobotics.roadrunner.ftc.Encoder;
+import com.acmerobotics.roadrunner.ftc.EncoderGroup;
+import com.acmerobotics.roadrunner.ftc.EncoderRef;
 import com.acmerobotics.roadrunner.ftc.ForwardPushTest;
 import com.acmerobotics.roadrunner.ftc.ForwardRampLogger;
 import com.acmerobotics.roadrunner.ftc.LateralPushTest;
 import com.acmerobotics.roadrunner.ftc.LateralRampLogger;
+import com.acmerobotics.roadrunner.ftc.LazyImu;
+import com.acmerobotics.roadrunner.ftc.LynxQuadratureEncoderGroup;
 import com.acmerobotics.roadrunner.ftc.ManualFeedforwardTuner;
 import com.acmerobotics.roadrunner.ftc.MecanumMotorDirectionDebugger;
+import com.acmerobotics.roadrunner.ftc.PinpointEncoderGroup;
+import com.acmerobotics.roadrunner.ftc.PinpointIMU;
+import com.acmerobotics.roadrunner.ftc.PinpointView;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
+import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.util.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.util.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.util.TwoDeadWheelLocalizer;
 
@@ -47,6 +58,49 @@ public final class TuningOpModes {
                 .build();
     }
 
+    private static PinpointView makePinpointView(PinpointLocalizer pl) {
+        return new PinpointView() {
+            GoBildaPinpointDriver.EncoderDirection parDirection = pl.initialParDirection;
+            GoBildaPinpointDriver.EncoderDirection perpDirection = pl.initialPerpDirection;
+
+            @Override
+            public void update() {
+                pl.driver.update();
+            }
+
+            @Override
+            public int getParEncoderPosition() {
+                return pl.driver.getEncoderX();
+            }
+
+            @Override
+            public int getPerpEncoderPosition() {
+                return pl.driver.getEncoderY();
+            }
+
+            @Override
+            public float getHeadingVelocity() {
+                return (float) pl.driver.getHeadingVelocity();
+            }
+
+            @Override
+            public void setParDirection(@NonNull DcMotorSimple.Direction direction) {
+                parDirection = direction == DcMotorSimple.Direction.FORWARD ?
+                        GoBildaPinpointDriver.EncoderDirection.FORWARD :
+                        GoBildaPinpointDriver.EncoderDirection.REVERSED;
+                pl.driver.setEncoderDirections(parDirection, perpDirection);
+            }
+
+            @Override
+            public void setPerpDirection(@NonNull DcMotorSimple.Direction direction) {
+                perpDirection = direction == DcMotorSimple.Direction.FORWARD ?
+                        GoBildaPinpointDriver.EncoderDirection.FORWARD :
+                        GoBildaPinpointDriver.EncoderDirection.REVERSED;
+                pl.driver.setEncoderDirections(parDirection, perpDirection);
+            }
+        };
+    }
+
     @OpModeRegistrar
     public static void register(OpModeManager manager) {
         if (DISABLED) return;
@@ -55,24 +109,34 @@ public final class TuningOpModes {
         if (DRIVE_CLASS.equals(Drivetrain.class)) {
             dvf = hardwareMap -> {
                 Drivetrain md = new Drivetrain(hardwareMap, new Pose2d(0, 0, 0));
+                LazyImu lazyImu = md.lazyImu;
 
-                List<Encoder> leftEncs = new ArrayList<>(), rightEncs = new ArrayList<>();
-                List<Encoder> parEncs = new ArrayList<>(), perpEncs = new ArrayList<>();
-                if (md.localizer instanceof Drivetrain.DriveLocalizer) {
-                    Drivetrain.DriveLocalizer dl = (Drivetrain.DriveLocalizer) md.localizer;
-                    leftEncs.add(dl.leftFront);
-                    leftEncs.add(dl.leftBack);
-                    rightEncs.add(dl.rightFront);
-                    rightEncs.add(dl.rightBack);
-                } else if (md.localizer instanceof ThreeDeadWheelLocalizer) {
+                List<EncoderGroup> encoderGroups = new ArrayList<>();
+                List<EncoderRef> leftEncs = new ArrayList<>(), rightEncs = new ArrayList<>();
+                List<EncoderRef> parEncs = new ArrayList<>(), perpEncs = new ArrayList<>();
+                if (md.localizer instanceof ThreeDeadWheelLocalizer) {
                     ThreeDeadWheelLocalizer dl = (ThreeDeadWheelLocalizer) md.localizer;
-                    parEncs.add(dl.par0);
-                    parEncs.add(dl.par1);
-                    perpEncs.add(dl.perp);
+                    encoderGroups.add(new LynxQuadratureEncoderGroup(
+                            hardwareMap.getAll(LynxModule.class),
+                            Arrays.asList(dl.par0, dl.par1, dl.perp)
+                    ));
+                    parEncs.add(new EncoderRef(0, 0));
+                    parEncs.add(new EncoderRef(0, 1));
+                    perpEncs.add(new EncoderRef(0, 2));
                 } else if (md.localizer instanceof TwoDeadWheelLocalizer) {
                     TwoDeadWheelLocalizer dl = (TwoDeadWheelLocalizer) md.localizer;
-                    parEncs.add(dl.par);
-                    perpEncs.add(dl.perp);
+                    encoderGroups.add(new LynxQuadratureEncoderGroup(
+                            hardwareMap.getAll(LynxModule.class),
+                            Arrays.asList(dl.par, dl.perp)
+                    ));
+                    parEncs.add(new EncoderRef(0, 0));
+                    perpEncs.add(new EncoderRef(0, 1));
+                }  else if (md.localizer instanceof PinpointLocalizer) {
+                    PinpointView pv = makePinpointView((PinpointLocalizer) md.localizer);
+                    encoderGroups.add(new PinpointEncoderGroup(pv));
+                    parEncs.add(new EncoderRef(0, 0));
+                    perpEncs.add(new EncoderRef(0, 1));
+                    lazyImu = new PinpointIMU(pv);
                 } else {
                     throw new RuntimeException("unknown localizer: " + md.localizer.getClass().getName());
                 }
@@ -83,7 +147,7 @@ public final class TuningOpModes {
                         Drivetrain.PARAMS.maxWheelVel,
                         Drivetrain.PARAMS.minProfileAccel,
                         Drivetrain.PARAMS.maxProfileAccel,
-                        hardwareMap.getAll(LynxModule.class),
+                        encoderGroups,
                         Arrays.asList(
                                 md.leftFront,
                                 md.leftBack
@@ -96,11 +160,12 @@ public final class TuningOpModes {
                         rightEncs,
                         parEncs,
                         perpEncs,
-                        md.lazyImu,
+                        lazyImu,
                         md.voltageSensor,
                         () -> new MotorFeedforward(Drivetrain.PARAMS.kS,
                                 Drivetrain.PARAMS.kV / Drivetrain.PARAMS.inPerTick,
-                                Drivetrain.PARAMS.kA / Drivetrain.PARAMS.inPerTick)
+                                Drivetrain.PARAMS.kA / Drivetrain.PARAMS.inPerTick),
+                        0
                 );
             };
         } else {
